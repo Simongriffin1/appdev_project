@@ -14,9 +14,16 @@
       <% @journal_entries.each do |entry| %>
         <li class="entry-list__item">
           <div class="entry-meta">
-            <%= entry.created_at.strftime("%b %-d, %Y") %>
+            <%= (entry.received_at || entry.created_at).strftime("%b %-d, %Y at %-I:%M %p") %>
             <% if entry.prompt %>
-              · From: "<%= entry.prompt.body.truncate(70) %>"
+              <% if entry.prompt.question_1.present? %>
+                · Reply to: "<%= entry.prompt.question_1.truncate(50) %>"
+              <% elsif entry.prompt.body.present? %>
+                · Reply to: "<%= entry.prompt.body.truncate(50) %>"
+              <% end %>
+            <% end %>
+            <% if entry.source == "email" %>
+              <span style="color: #28a745;">· Email</span>
             <% end %>
           </div>
 

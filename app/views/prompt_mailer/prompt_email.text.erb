@@ -1,0 +1,16 @@
+Hello <%= @user.email.split('@').first.capitalize %>,
+
+Here are your journaling questions for today:
+
+Question 1
+<%= @prompt.question_1 %>
+
+Question 2
+<%= @prompt.question_2 %>
+
+---
+
+How to reply: Simply reply to this email with your thoughts. Write freely—there's no strict format required. Your response will be saved as a journal entry.
+
+Happy journaling!
+— Inbox Journal

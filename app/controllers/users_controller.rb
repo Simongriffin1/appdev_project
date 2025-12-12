@@ -10,7 +10,11 @@ class UsersController < ApplicationController
 
     if @user.save
       session[:user_id] = @user.id
-      redirect_to dashboard_path, notice: "Account created successfully. Welcome!"
+      if @user.onboarding_complete?
+        redirect_to dashboard_path, notice: "Account created successfully. Welcome!"
+      else
+        redirect_to settings_path, notice: "Account created! Please complete your settings."
+      end
     else
       render :new, status: :unprocessable_entity
     end

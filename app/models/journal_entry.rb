@@ -16,6 +16,6 @@ class JournalEntry < ApplicationRecord
   private
 
   def set_default_source
-    self.source ||= "web"
+    self.source ||= "email"
   end
 end

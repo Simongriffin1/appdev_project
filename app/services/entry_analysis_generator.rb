@@ -71,7 +71,8 @@ class EntryAnalysisGenerator
           { role: "user", content: prompt }
         ],
         temperature: 0.3,
-        max_tokens: 300
+        max_tokens: 300,
+        response_format: { type: "json_object" }
       }
     )
 

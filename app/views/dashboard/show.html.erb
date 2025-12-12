@@ -1,65 +1,79 @@
 <h1 class="page-title">Welcome back, <%= current_user.email %></h1>
-<p class="muted">Your personal AI journaling space. Start by answering today's question or browsing recent entries.</p>
+<p class="muted">Your email-first AI journaling space. Reply to your prompt emails to create entries.</p>
 
 <div class="card-grid">
-  <!-- Current prompt -->
+  <!-- Email Schedule -->
   <section class="card">
-    <h2 class="card__title">Today's question</h2>
-    <p class="card__subtitle">
-      Generated from your recent reflections.
-    </p>
-
-    <% if @latest_prompt %>
-      <p><%= @latest_prompt.body %></p>
-
+    <h2 class="card__title">Email Schedule</h2>
+    <% if current_user.onboarding_complete? %>
+      <p class="card__subtitle">
+        <% if current_user.next_prompt_at %>
+          Next email: <%= current_user.next_prompt_at.in_time_zone(current_user.time_zone).strftime("%B %-d at %-I:%M %p") %>
+        <% else %>
+          Schedule not set
+        <% end %>
+      </p>
+      
       <div class="btn-row">
-        <%= link_to "Answer this question", prompt_path(@latest_prompt), class: "btn btn-primary" %>
-
-        <%= form_with url: generate_prompts_path, method: :post, class: "inline-form" do |f| %>
-          <%= f.submit "Generate a new AI question", class: "btn btn-ghost" %>
+        <%= form_with url: send_prompt_path, method: :post, class: "inline-form" do |f| %>
+          <%= f.submit "Send me my next email now", class: "btn btn-primary" %>
         <% end %>
       </div>
+      
+      <div class="btn-row" style="margin-top: 0.5rem;">
+        <%= link_to "Update settings", settings_path, class: "btn btn-ghost" %>
+      </div>
     <% else %>
-      <p class="muted">
-        You don't have a question yet. Let the AI read your (future) entries and suggest focused follow-ups.
-      </p>
-
+      <p class="muted">Please complete your settings to start receiving email prompts.</p>
       <div class="btn-row">
-        <%= form_with url: generate_prompts_path, method: :post do |f| %>
-          <%= f.submit "Get my first AI question", class: "btn btn-primary" %>
-        <% end %>
+        <%= link_to "Complete setup", settings_path, class: "btn btn-primary" %>
       </div>
     <% end %>
   </section>
 
-  <!-- Quick links -->
+  <!-- Last prompt sent -->
   <section class="card">
-    <h2 class="card__title">Quick actions</h2>
-    <ul class="entry-list">
-      <li class="entry-list__item">
-        <%= link_to "Write a free-form entry", new_journal_entry_path, class: "btn btn-ghost" %>
-      </li>
-      <li class="entry-list__item">
-        <%= link_to "Browse all entries", journal_entries_path, class: "btn btn-ghost" %>
-      </li>
-      <li class="entry-list__item">
-        <%= link_to "Browse by topic", topics_path, class: "btn btn-ghost" %>
-      </li>
-    </ul>
+    <h2 class="card__title">Last prompt sent</h2>
+    <% last_sent_prompt = current_user.prompts.where.not(sent_at: nil).order(sent_at: :desc).first %>
+    <% if last_sent_prompt %>
+      <p class="card__subtitle">
+        Sent <%= last_sent_prompt.sent_at.in_time_zone(current_user.time_zone || "UTC").strftime("%B %-d at %-I:%M %p") %>
+      </p>
+      <div style="margin-top: 1rem;">
+        <% if last_sent_prompt.question_1.present? %>
+          <p><strong>Question 1:</strong> <%= last_sent_prompt.question_1 %></p>
+        <% end %>
+        <% if last_sent_prompt.question_2.present? %>
+          <p><strong>Question 2:</strong> <%= last_sent_prompt.question_2 %></p>
+        <% end %>
+        <% if last_sent_prompt.question_1.blank? && last_sent_prompt.body.present? %>
+          <p><%= last_sent_prompt.body %></p>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="muted">No prompts sent yet.</p>
+    <% end %>
   </section>
 
-  <!-- Recent entries -->
+  <!-- Recent replies -->
   <section class="card card--full">
-    <h2 class="card__title">Recent entries</h2>
+    <h2 class="card__title">Recent replies</h2>
 
     <% if @recent_entries.any? %>
       <ul class="entry-list">
         <% @recent_entries.each do |entry| %>
           <li class="entry-list__item">
             <div class="entry-meta">
-              <%= entry.created_at.strftime("%b %-d, %Y") %>
+              <%= (entry.received_at || entry.created_at).strftime("%b %-d, %Y at %-I:%M %p") %>
               <% if entry.prompt %>
-                · From question: "<%= entry.prompt.body.truncate(60) %>"
+                <% if entry.prompt.question_1.present? %>
+                  · Reply to: "<%= entry.prompt.question_1.truncate(40) %>"
+                <% elsif entry.prompt.body.present? %>
+                  · Reply to: "<%= entry.prompt.body.truncate(40) %>"
+                <% end %>
+              <% end %>
+              <% if entry.source == "email" %>
+                <span style="color: #28a745;">· Email</span>
               <% end %>
             </div>
 
@@ -68,13 +82,13 @@
             </div>
 
             <div class="btn-row" style="margin-top: 0.4rem;">
-              <%= link_to "Open entry", journal_entry_path(entry), class: "btn btn-ghost" %>
+              <%= link_to "View entry", journal_entry_path(entry), class: "btn btn-ghost" %>
             </div>
           </li>
         <% end %>
       </ul>
     <% else %>
-      <p class="muted">No entries yet. Answer your first question above to get started.</p>
+      <p class="muted">No entries yet. Reply to your first prompt email to get started.</p>
     <% end %>
   </section>
 </div>

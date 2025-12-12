@@ -4,6 +4,11 @@ class ApplicationController < ActionController::Base
 
   # Authentication - require login by default
   before_action :authenticate_user!
+  before_action :ensure_onboarding_complete, unless: -> { 
+    controller_name == "settings" || 
+    controller_name == "sessions" || 
+    controller_name == "users" 
+  }
 
   # Authentication helpers
   def current_user
@@ -16,4 +21,11 @@ class ApplicationController < ActionController::Base
   end
 
   helper_method :current_user
+
+  private
+
+  def ensure_onboarding_complete
+    return if current_user.nil? || current_user.onboarding_complete?
+    redirect_to settings_path, alert: "Please complete your settings first."
+  end
 end

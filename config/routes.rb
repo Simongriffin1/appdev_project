@@ -7,9 +7,16 @@ Rails.application.routes.draw do
   # User sign-up
   resources :users, only: [:new, :create]
 
+  # Settings
+  get "/settings" => "settings#show", as: :settings
+  patch "/settings" => "settings#update"
+
   # Dashboard (root)
   get "/dashboard" => "dashboard#show", as: :dashboard
   root "dashboard#show"
+  
+  # Manual prompt sending
+  post "/dashboard/send_prompt" => "dashboard#send_prompt", as: :send_prompt
 
   # Prompts with generate action
   resources :prompts, only: [:index, :show] do
