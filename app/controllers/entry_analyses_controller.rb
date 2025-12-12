@@ -1,5 +1,4 @@
 class EntryAnalysesController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_entry_analysis, only: %i[show]
 
   # GET /entry_analyses

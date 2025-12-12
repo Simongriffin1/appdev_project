@@ -10,4 +10,12 @@ class User < ApplicationRecord
   has_many :entry_analyses, through: :journal_entries
 
   validates :email, presence: true, uniqueness: true
+
+  before_save :normalize_email
+
+  private
+
+  def normalize_email
+    self.email = email.to_s.downcase.strip if email.present?
+  end
 end

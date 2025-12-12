@@ -1,5 +1,4 @@
 class PromptsController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_prompt, only: [:show]
 
   def index

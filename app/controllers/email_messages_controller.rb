@@ -1,5 +1,4 @@
 class EmailMessagesController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_email_message, only: [:show]
 
   # GET /email_messages

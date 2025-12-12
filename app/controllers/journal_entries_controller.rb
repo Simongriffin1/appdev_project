@@ -1,5 +1,4 @@
 class JournalEntriesController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_journal_entry, only: [:show]
 
   def index
