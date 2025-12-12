@@ -1,19 +1,28 @@
-<h1>Topics</h1>
+<h1 class="page-title">Topics</h1>
 
-<% if @topics.any? %>
-  <ul style="list-style: none; padding: 0;">
-    <% @topics.each do |topic| %>
-      <li style="padding: 10px; margin-bottom: 5px; border: 1px solid #ddd;">
-        <%= link_to topic.name, journal_entries_path(topic_id: topic.id) %>
-        (<%= topic.journal_entries.count %> entries)
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No topics yet. Topics will be created automatically when entries are analyzed.</p>
-<% end %>
+<div class="card">
+  <% if @topics.any? %>
+    <p class="card__subtitle">
+      Click a topic to see all the entries where it shows up.
+    </p>
 
-<p style="margin-top: 20px;">
-  <%= link_to "Back to Dashboard", dashboard_path %> |
-  <%= link_to "All Entries", journal_entries_path %>
-</p>
+    <ul class="entry-list">
+      <% @topics.each do |topic| %>
+        <li class="entry-list__item">
+          <%= link_to topic.name, journal_entries_path(topic_id: topic.id), class: "badge" %>
+          <span class="muted">
+            · <%= topic.journal_entries.count %> entr<%= topic.journal_entries.count == 1 ? "y" : "ies" %>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="muted">
+      No topics yet. Once you have a few analyzed entries, the AI will start tagging recurring themes.
+    </p>
+  <% end %>
+
+  <div class="btn-row" style="margin-top: 1rem;">
+    <%= link_to "Back to dashboard", dashboard_path, class: "btn btn-ghost" %>
+  </div>
+</div>

@@ -1,26 +1,30 @@
-<h1>All Prompts</h1>
+<h1 class="page-title">All Prompts</h1>
 
-<% if @prompts.any? %>
-  <ul style="list-style: none; padding: 0;">
-    <% @prompts.each do |prompt| %>
-      <li style="padding: 15px; margin-bottom: 15px; border: 1px solid #ddd;">
-        <div style="margin-bottom: 10px;">
-          <strong><%= prompt.created_at.to_date %></strong>
-          <span style="color: #666;">(<%= prompt.source %>)</span>
-        </div>
-        <div style="margin: 10px 0;">
-          <%= prompt.body %>
-        </div>
-        <div>
-          <%= link_to "View", prompt_path(prompt) %>
-        </div>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No prompts yet.</p>
-<% end %>
+<div class="card">
+  <% if @prompts.any? %>
+    <ul class="entry-list">
+      <% @prompts.each do |prompt| %>
+        <li class="entry-list__item">
+          <div class="entry-meta">
+            <%= prompt.created_at.strftime("%b %-d, %Y") %>
+            <span class="muted">(<%= prompt.source %>)</span>
+          </div>
 
-<p style="margin-top: 20px;">
-  <%= link_to "Back to Dashboard", dashboard_path %>
-</p>
+          <div class="entry-body">
+            <%= prompt.body %>
+          </div>
+
+          <div class="btn-row" style="margin-top: 0.4rem;">
+            <%= link_to "View", prompt_path(prompt), class: "btn btn-ghost" %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="muted">No prompts yet.</p>
+  <% end %>
+
+  <div class="btn-row" style="margin-top: 1rem;">
+    <%= link_to "Back to Dashboard", dashboard_path, class: "btn btn-ghost" %>
+  </div>
+</div>

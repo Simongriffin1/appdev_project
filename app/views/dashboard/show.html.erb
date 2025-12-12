@@ -1,61 +1,80 @@
-<div style="margin-bottom: 20px;">
-  <p>Signed in as: <strong><%= current_user.email %></strong></p>
-  <%= button_to "Sign out", sign_out_path, method: :delete, style: "display: inline-block; padding: 5px 10px;" %>
-</div>
+<h1 class="page-title">Welcome back, <%= current_user.email %></h1>
+<p class="muted">Your personal AI journaling space. Start by answering today's question or browsing recent entries.</p>
 
-<h1>Dashboard</h1>
+<div class="card-grid">
+  <!-- Current prompt -->
+  <section class="card">
+    <h2 class="card__title">Today's question</h2>
+    <p class="card__subtitle">
+      Generated from your recent reflections.
+    </p>
 
-<section style="margin-bottom: 30px;">
-  <h2>Current Prompt</h2>
-  
-  <% if @latest_prompt %>
-    <div style="padding: 15px; border: 1px solid #ccc; margin-bottom: 15px;">
-      <p style="font-size: 1.2em;"><%= @latest_prompt.body %></p>
-    </div>
-    <div style="margin-bottom: 15px;">
-      <%= link_to "Answer this prompt", prompt_path(@latest_prompt), style: "display: inline-block; padding: 8px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;" %>
-      <%= form_with url: generate_prompts_path, method: :post, style: "display: inline-block;" do |f| %>
-        <%= f.submit "Generate new AI prompt", style: "padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;" %>
-      <% end %>
-    </div>
-  <% else %>
-    <p>No prompts yet.</p>
-    <%= form_with url: generate_prompts_path, method: :post do |f| %>
-      <%= f.submit "Generate new AI prompt", style: "padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;" %>
+    <% if @latest_prompt %>
+      <p><%= @latest_prompt.body %></p>
+
+      <div class="btn-row">
+        <%= link_to "Answer this question", prompt_path(@latest_prompt), class: "btn btn-primary" %>
+
+        <%= form_with url: generate_prompts_path, method: :post, class: "inline-form" do |f| %>
+          <%= f.submit "Generate a new AI question", class: "btn btn-ghost" %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="muted">
+        You don't have a question yet. Let the AI read your (future) entries and suggest focused follow-ups.
+      </p>
+
+      <div class="btn-row">
+        <%= form_with url: generate_prompts_path, method: :post do |f| %>
+          <%= f.submit "Get my first AI question", class: "btn btn-primary" %>
+        <% end %>
+      </div>
     <% end %>
-  <% end %>
-</section>
+  </section>
 
-<section>
-  <h2>Recent Entries</h2>
-  
-  <% if @recent_entries.any? %>
-    <ul style="list-style: none; padding: 0;">
-      <% @recent_entries.each do |entry| %>
-        <li style="padding: 10px; margin-bottom: 10px; border: 1px solid #ddd;">
-          <div>
-            <strong><%= entry.created_at.to_date %></strong>
-            <% if entry.prompt %>
-              <div style="color: #666; font-style: italic;">
-                Prompt: <%= entry.prompt.body.truncate(50) %>
-              </div>
-            <% end %>
-          </div>
-          <div style="margin: 5px 0;">
-            <%= entry.body.truncate(100) %>
-          </div>
-          <div>
-            <%= link_to "View", journal_entry_path(entry) %>
-          </div>
-        </li>
-      <% end %>
+  <!-- Quick links -->
+  <section class="card">
+    <h2 class="card__title">Quick actions</h2>
+    <ul class="entry-list">
+      <li class="entry-list__item">
+        <%= link_to "Write a free-form entry", new_journal_entry_path, class: "btn btn-ghost" %>
+      </li>
+      <li class="entry-list__item">
+        <%= link_to "Browse all entries", journal_entries_path, class: "btn btn-ghost" %>
+      </li>
+      <li class="entry-list__item">
+        <%= link_to "Browse by topic", topics_path, class: "btn btn-ghost" %>
+      </li>
     </ul>
-  <% else %>
-    <p>No entries yet.</p>
-  <% end %>
-</section>
+  </section>
 
-<p style="margin-top: 20px;">
-  <%= link_to "All Entries", journal_entries_path %> |
-  <%= link_to "Topics", topics_path %>
-</p>
+  <!-- Recent entries -->
+  <section class="card card--full">
+    <h2 class="card__title">Recent entries</h2>
+
+    <% if @recent_entries.any? %>
+      <ul class="entry-list">
+        <% @recent_entries.each do |entry| %>
+          <li class="entry-list__item">
+            <div class="entry-meta">
+              <%= entry.created_at.strftime("%b %-d, %Y") %>
+              <% if entry.prompt %>
+                · From question: "<%= entry.prompt.body.truncate(60) %>"
+              <% end %>
+            </div>
+
+            <div class="entry-body">
+              <%= entry.body.truncate(160) %>
+            </div>
+
+            <div class="btn-row" style="margin-top: 0.4rem;">
+              <%= link_to "Open entry", journal_entry_path(entry), class: "btn btn-ghost" %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="muted">No entries yet. Answer your first question above to get started.</p>
+    <% end %>
+  </section>
+</div>

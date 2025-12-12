@@ -13,7 +13,7 @@ Rails.application.routes.draw do
 
   # Prompts with generate action
   resources :prompts, only: [:index, :show] do
-    post :generate, on: :collection
+    post :generate, on: :collection, as: :generate
   end
 
   # Journal entries

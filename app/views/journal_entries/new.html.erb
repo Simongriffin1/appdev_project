@@ -1,28 +1,25 @@
-<h1>New Journal Entry</h1>
+<h1 class="page-title">New Journal Entry</h1>
 
-<% if @journal_entry.errors.any? %>
-  <div style="color: red;">
-    <ul>
+<div class="card">
+  <% if @journal_entry.errors.any? %>
+    <div class="flash flash--alert">
       <% @journal_entry.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
+        <div><%= message %></div>
       <% end %>
-    </ul>
-  </div>
-<% end %>
+    </div>
+  <% end %>
 
-<%= form_with model: @journal_entry, url: journal_entries_path do |f| %>
-  <%= f.hidden_field :prompt_id if @journal_entry.prompt_id.present? %>
+  <%= form_with model: @journal_entry, url: journal_entries_path do |f| %>
+    <%= f.hidden_field :prompt_id if @journal_entry.prompt_id.present? %>
 
-  <div style="margin-bottom: 15px;">
-    <%= f.label :body, "Write your entry:" %><br>
-    <%= f.text_area :body, rows: 8, style: "width: 100%; max-width: 600px;", required: true %>
-  </div>
+    <div class="form-field">
+      <%= f.label :body, "Write your entry:" %>
+      <%= f.text_area :body, required: true %>
+    </div>
 
-  <div>
-    <%= f.submit "Save entry", style: "padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;" %>
-  </div>
-<% end %>
-
-<p style="margin-top: 20px;">
-  <%= link_to "Back to Dashboard", dashboard_path %>
-</p>
+    <div class="btn-row">
+      <%= f.submit "Save entry", class: "btn btn-primary" %>
+      <%= link_to "Back to Dashboard", dashboard_path, class: "btn btn-ghost" %>
+    </div>
+  <% end %>
+</div>

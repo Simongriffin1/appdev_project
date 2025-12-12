@@ -1,36 +1,40 @@
-<h1>Journal Entries</h1>
+<h1 class="page-title">Your entries</h1>
 
 <% if @filtered_topic %>
-  <p>Filtered by topic: <strong><%= @filtered_topic.name %></strong></p>
-  <p><%= link_to "Show all entries", journal_entries_path %></p>
+  <p class="muted">
+    Showing entries tagged with
+    <span class="badge"><%= @filtered_topic.name %></span>
+    <%= link_to "Clear filter", journal_entries_path %>
+  </p>
 <% end %>
 
-<% if @journal_entries.any? %>
-  <ul style="list-style: none; padding: 0;">
-    <% @journal_entries.each do |entry| %>
-      <li style="padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; background: #f9f9f9;">
-        <div style="margin-bottom: 10px;">
-          <strong><%= entry.created_at.to_date %></strong>
-          <% if entry.prompt %>
-            <div style="color: #666; font-style: italic; margin-top: 5px;">
-              Prompt: <%= entry.prompt.body.truncate(80) %>
-            </div>
-          <% end %>
-        </div>
-        <div style="margin: 10px 0;">
-          <%= entry.body.truncate(200) %>
-        </div>
-        <div>
-          <%= link_to "View full entry", journal_entry_path(entry) %>
-        </div>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No entries yet.</p>
-<% end %>
+<div class="card">
+  <% if @journal_entries.any? %>
+    <ul class="entry-list">
+      <% @journal_entries.each do |entry| %>
+        <li class="entry-list__item">
+          <div class="entry-meta">
+            <%= entry.created_at.strftime("%b %-d, %Y") %>
+            <% if entry.prompt %>
+              · From: "<%= entry.prompt.body.truncate(70) %>"
+            <% end %>
+          </div>
 
-<p style="margin-top: 20px;">
-  <%= link_to "Back to Dashboard", dashboard_path %> |
-  <%= link_to "Topics", topics_path %>
-</p>
+          <div class="entry-body">
+            <%= entry.body.truncate(220) %>
+          </div>
+
+          <div class="btn-row" style="margin-top: 0.4rem;">
+            <%= link_to "Open entry", journal_entry_path(entry), class: "btn btn-ghost" %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="muted">No entries yet. Start by answering a question on your dashboard.</p>
+  <% end %>
+
+  <div class="btn-row" style="margin-top: 1rem;">
+    <%= link_to "Back to dashboard", dashboard_path, class: "btn btn-ghost" %>
+  </div>
+</div>
