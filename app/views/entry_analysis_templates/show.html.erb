@@ -1,0 +1,201 @@
+<h1>
+  Entry analysis #<%= @the_entry_analysis.id %> details
+</h1>
+
+<article>
+  <div>
+    <a href="/entry_analyses">
+      Go back
+    </a>
+  </div>
+
+  <div>
+    <a href="/delete_entry_analysis/<%= @the_entry_analysis.id %>">
+      Delete entry analysis
+    </a>
+  </div>
+  <dl>
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.  %>
+    </dd>
+
+    <dt>
+      Journal entry
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.journal_entry_id %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.  %>
+    </dd>
+
+    <dt>
+      Summary
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.summary %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.  %>
+    </dd>
+
+    <dt>
+      Sentiment
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.sentiment %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.  %>
+    </dd>
+
+    <dt>
+      Emotion
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.emotion %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.  %>
+    </dd>
+
+    <dt>
+      Keywords
+    </dt>
+    <dd>
+      <%= @the_entry_analysis.keywords %>
+    </dd>
+
+    <dt>
+      Created at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_entry_analysis.created_at) %> ago
+    </dd>
+
+    <dt>
+      Updated at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_entry_analysis.updated_at) %> ago
+    </dd>
+  </dl>
+</article>
+
+<hr>
+
+
+<article>
+  <header>
+    <h2>
+      Edit entry analysis
+    </h2>
+  </header>
+
+  <form action="/modify_entry_analysis/<%= @the_entry_analysis.id %>"  method="post" >
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_entry_analysis.  %>">
+    </div>
+
+    <div>
+      <label for="journal_entry_id_box">
+        Journal entry
+      </label>
+
+      <input type="text" id="journal_entry_id_box" name="query_journal_entry_id" value="<%= @the_entry_analysis.journal_entry_id %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_entry_analysis.  %>">
+    </div>
+
+    <div>
+      <label for="summary_box">
+        Summary
+      </label>
+
+      <input type="text" id="summary_box" name="query_summary" value="<%= @the_entry_analysis.summary %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_entry_analysis.  %>">
+    </div>
+
+    <div>
+      <label for="sentiment_box">
+        Sentiment
+      </label>
+
+      <input type="text" id="sentiment_box" name="query_sentiment" value="<%= @the_entry_analysis.sentiment %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_entry_analysis.  %>">
+    </div>
+
+    <div>
+      <label for="emotion_box">
+        Emotion
+      </label>
+
+      <input type="text" id="emotion_box" name="query_emotion" value="<%= @the_entry_analysis.emotion %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_entry_analysis.  %>">
+    </div>
+
+    <div>
+      <label for="keywords_box">
+        Keywords
+      </label>
+
+      <input type="text" id="keywords_box" name="query_keywords" value="<%= @the_entry_analysis.keywords %>">
+    </div>
+
+    <button type="submit">
+      Update entry analysis
+    </button>
+  </form>
+</article>
+
+<hr>

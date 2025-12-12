@@ -1,0 +1,111 @@
+<h1>
+  Topic #<%= @the_topic.id %> details
+</h1>
+
+<article>
+  <div>
+    <a href="/topics">
+      Go back
+    </a>
+  </div>
+
+  <div>
+    <a href="/delete_topic/<%= @the_topic.id %>">
+      Delete topic
+    </a>
+  </div>
+  <dl>
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_topic.  %>
+    </dd>
+
+    <dt>
+      User
+    </dt>
+    <dd>
+      <%= @the_topic.user_id %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_topic.  %>
+    </dd>
+
+    <dt>
+      Name
+    </dt>
+    <dd>
+      <%= @the_topic.name %>
+    </dd>
+
+    <dt>
+      Created at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_topic.created_at) %> ago
+    </dd>
+
+    <dt>
+      Updated at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_topic.updated_at) %> ago
+    </dd>
+  </dl>
+</article>
+
+<hr>
+
+
+<article>
+  <header>
+    <h2>
+      Edit topic
+    </h2>
+  </header>
+
+  <form action="/modify_topic/<%= @the_topic.id %>"  method="post" >
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_topic.  %>">
+    </div>
+
+    <div>
+      <label for="user_id_box">
+        User
+      </label>
+
+      <input type="text" id="user_id_box" name="query_user_id" value="<%= @the_topic.user_id %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_topic.  %>">
+    </div>
+
+    <div>
+      <label for="name_box">
+        Name
+      </label>
+
+      <input type="text" id="name_box" name="query_name" value="<%= @the_topic.name %>">
+    </div>
+
+    <button type="submit">
+      Update topic
+    </button>
+  </form>
+</article>
+
+<hr>

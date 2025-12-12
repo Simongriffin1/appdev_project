@@ -1,0 +1,115 @@
+<h1>
+  List of all entry analyses
+</h1>
+
+<hr>
+
+<article>
+  <header>
+    <h2>
+      Add a new entry analysis
+    </h2>
+  </header>
+
+  <form action="/insert_entry_analysis" method="post">
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="journal_entry_id_box">
+        Journal entry
+      </label>
+
+      <input type="text" id="journal_entry_id_box" name="query_journal_entry_id">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="summary_box">
+        Summary
+      </label>
+
+      <input type="text" id="summary_box" name="query_summary">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="sentiment_box">
+        Sentiment
+      </label>
+
+      <input type="text" id="sentiment_box" name="query_sentiment">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="emotion_box">
+        Emotion
+      </label>
+
+      <input type="text" id="emotion_box" name="query_emotion">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="keywords_box">
+        Keywords
+      </label>
+
+      <input type="text" id="keywords_box" name="query_keywords">
+    </div>
+
+    <button type="submit">
+      Create entry analysis
+    </button>
+  </form>
+</article>
+
+<hr>
+
+<article>
+  <ul>
+    <% @list_of_entry_analyses.each do |an_entry_analysis| %>
+      <li>
+        <a href="/entry_analyses/<%= an_entry_analysis.id %>">
+          Entry analysis #<%= an_entry_analysis.id %>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</article>
+
+<hr>

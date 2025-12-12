@@ -1,0 +1,67 @@
+<h1>
+  List of all entry topics
+</h1>
+
+<hr>
+
+<article>
+  <header>
+    <h2>
+      Add a new entry topic
+    </h2>
+  </header>
+
+  <form action="/insert_entry_topic" method="post">
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="journal_entry_id_box">
+        Journal entry
+      </label>
+
+      <input type="text" id="journal_entry_id_box" name="query_journal_entry_id">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="topic_id_box">
+        Topic
+      </label>
+
+      <input type="text" id="topic_id_box" name="query_topic_id">
+    </div>
+
+    <button type="submit">
+      Create entry topic
+    </button>
+  </form>
+</article>
+
+<hr>
+
+<article>
+  <ul>
+    <% @list_of_entry_topics.each do |an_entry_topic| %>
+      <li>
+        <a href="/entry_topics/<%= an_entry_topic.id %>">
+          Entry topic #<%= an_entry_topic.id %>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</article>
+
+<hr>

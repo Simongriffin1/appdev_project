@@ -1,0 +1,67 @@
+<h1>
+  List of all prompts
+</h1>
+
+<hr>
+
+<article>
+  <header>
+    <h2>
+      Add a new prompt
+    </h2>
+  </header>
+
+  <form action="/insert_prompt" method="post">
+    <div>
+      <label for="body_box">
+        Body
+      </label>
+
+      <input type="text" id="body_box" name="query_body">
+    </div>
+
+    <div>
+      <label for="parent_prompt_id_box">
+        Parent prompt
+      </label>
+
+      <input type="text" id="parent_prompt_id_box" name="query_parent_prompt_id">
+    </div>
+
+    <div>
+      <label for="user_id_box">
+        User
+      </label>
+
+      <input type="text" id="user_id_box" name="query_user_id">
+    </div>
+
+    <div>
+      <label for="source_box">
+        Source
+      </label>
+
+      <input type="text" id="source_box" name="query_source">
+    </div>
+
+    <button type="submit">
+      Create prompt
+    </button>
+  </form>
+</article>
+
+<hr>
+
+<article>
+  <ul>
+    <% @list_of_prompts.each do |a_prompt| %>
+      <li>
+        <a href="/prompts/<%= a_prompt.id %>">
+          Prompt #<%= a_prompt.id %>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</article>
+
+<hr>

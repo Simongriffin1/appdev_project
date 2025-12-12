@@ -10,9 +10,66 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_13_202311) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_12_001609) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "email_messages", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "direction"
+    t.bigint "prompt_id", null: false
+    t.bigint "journal_entry_id", null: false
+    t.string "subject"
+    t.text "body"
+    t.datetime "sent_or_received_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["journal_entry_id"], name: "index_email_messages_on_journal_entry_id"
+    t.index ["prompt_id"], name: "index_email_messages_on_prompt_id"
+    t.index ["user_id"], name: "index_email_messages_on_user_id"
+  end
+
+  create_table "entry_analyses", force: :cascade do |t|
+    t.bigint "journal_entry_id", null: false
+    t.text "summary"
+    t.string "sentiment"
+    t.string "emotion"
+    t.text "keywords"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["journal_entry_id"], name: "index_entry_analyses_on_journal_entry_id"
+  end
+
+  create_table "entry_topics", force: :cascade do |t|
+    t.bigint "journal_entry_id", null: false
+    t.bigint "topic_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["journal_entry_id", "topic_id"], name: "index_entry_topics_on_journal_entry_id_and_topic_id", unique: true
+    t.index ["journal_entry_id"], name: "index_entry_topics_on_journal_entry_id"
+    t.index ["topic_id"], name: "index_entry_topics_on_topic_id"
+  end
+
+  create_table "journal_entries", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "prompt_id", null: false
+    t.text "body"
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["prompt_id"], name: "index_journal_entries_on_prompt_id"
+    t.index ["user_id"], name: "index_journal_entries_on_user_id"
+  end
+
+  create_table "prompts", force: :cascade do |t|
+    t.text "body"
+    t.integer "parent_prompt_id"
+    t.bigint "user_id", null: false
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_prompts_on_user_id"
+  end
 
   create_table "solid_cable_messages", force: :cascade do |t|
     t.binary "channel", null: false
@@ -156,10 +213,39 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_202311) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "topics", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "name"], name: "index_topics_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_topics_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email"
+    t.string "password_digest"
+    t.string "time_zone"
+    t.string "prompt_frequency"
+    t.string "prompt_channel"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "email_messages", "journal_entries"
+  add_foreign_key "email_messages", "prompts"
+  add_foreign_key "email_messages", "users"
+  add_foreign_key "entry_analyses", "journal_entries"
+  add_foreign_key "entry_topics", "journal_entries"
+  add_foreign_key "entry_topics", "topics"
+  add_foreign_key "journal_entries", "prompts"
+  add_foreign_key "journal_entries", "users"
+  add_foreign_key "prompts", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "topics", "users"
 end

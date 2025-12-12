@@ -1,0 +1,75 @@
+<h1>
+  List of all users
+</h1>
+
+<hr>
+
+<article>
+  <header>
+    <h2>
+      Add a new user
+    </h2>
+  </header>
+
+  <form action="/insert_user" method="post">
+    <div>
+      <label for="email_box">
+        Email
+      </label>
+
+      <input type="text" id="email_box" name="query_email">
+    </div>
+
+    <div>
+      <label for="password_digest_box">
+        Password digest
+      </label>
+
+      <input type="text" id="password_digest_box" name="query_password_digest">
+    </div>
+
+    <div>
+      <label for="time_zone_box">
+        Time zone
+      </label>
+
+      <input type="text" id="time_zone_box" name="query_time_zone">
+    </div>
+
+    <div>
+      <label for="prompt_frequency_box">
+        Prompt frequency
+      </label>
+
+      <input type="text" id="prompt_frequency_box" name="query_prompt_frequency">
+    </div>
+
+    <div>
+      <label for="prompt_channel_box">
+        Prompt channel
+      </label>
+
+      <input type="text" id="prompt_channel_box" name="query_prompt_channel">
+    </div>
+
+    <button type="submit">
+      Create user
+    </button>
+  </form>
+</article>
+
+<hr>
+
+<article>
+  <ul>
+    <% @list_of_users.each do |a_user| %>
+      <li>
+        <a href="/users/<%= a_user.id %>">
+          User #<%= a_user.id %>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</article>
+
+<hr>

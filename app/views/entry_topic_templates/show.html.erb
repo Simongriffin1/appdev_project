@@ -1,0 +1,111 @@
+<h1>
+  Entry topic #<%= @the_entry_topic.id %> details
+</h1>
+
+<article>
+  <div>
+    <a href="/entry_topics">
+      Go back
+    </a>
+  </div>
+
+  <div>
+    <a href="/delete_entry_topic/<%= @the_entry_topic.id %>">
+      Delete entry topic
+    </a>
+  </div>
+  <dl>
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_entry_topic.  %>
+    </dd>
+
+    <dt>
+      Journal entry
+    </dt>
+    <dd>
+      <%= @the_entry_topic.journal_entry_id %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_entry_topic.  %>
+    </dd>
+
+    <dt>
+      Topic
+    </dt>
+    <dd>
+      <%= @the_entry_topic.topic_id %>
+    </dd>
+
+    <dt>
+      Created at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_entry_topic.created_at) %> ago
+    </dd>
+
+    <dt>
+      Updated at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_entry_topic.updated_at) %> ago
+    </dd>
+  </dl>
+</article>
+
+<hr>
+
+
+<article>
+  <header>
+    <h2>
+      Edit entry topic
+    </h2>
+  </header>
+
+  <form action="/modify_entry_topic/<%= @the_entry_topic.id %>"  method="post" >
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_entry_topic.  %>">
+    </div>
+
+    <div>
+      <label for="journal_entry_id_box">
+        Journal entry
+      </label>
+
+      <input type="text" id="journal_entry_id_box" name="query_journal_entry_id" value="<%= @the_entry_topic.journal_entry_id %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_entry_topic.  %>">
+    </div>
+
+    <div>
+      <label for="topic_id_box">
+        Topic
+      </label>
+
+      <input type="text" id="topic_id_box" name="query_topic_id" value="<%= @the_entry_topic.topic_id %>">
+    </div>
+
+    <button type="submit">
+      Update entry topic
+    </button>
+  </form>
+</article>
+
+<hr>

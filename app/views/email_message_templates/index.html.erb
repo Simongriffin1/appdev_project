@@ -1,0 +1,147 @@
+<h1>
+  List of all email messages
+</h1>
+
+<hr>
+
+<article>
+  <header>
+    <h2>
+      Add a new email message
+    </h2>
+  </header>
+
+  <form action="/insert_email_message" method="post">
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="user_id_box">
+        User
+      </label>
+
+      <input type="text" id="user_id_box" name="query_user_id">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="direction_box">
+        Direction
+      </label>
+
+      <input type="text" id="direction_box" name="query_direction">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="prompt_id_box">
+        Prompt
+      </label>
+
+      <input type="text" id="prompt_id_box" name="query_prompt_id">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="journal_entry_id_box">
+        Journal entry
+      </label>
+
+      <input type="text" id="journal_entry_id_box" name="query_journal_entry_id">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="subject_box">
+        Subject
+      </label>
+
+      <input type="text" id="subject_box" name="query_subject">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="body_box">
+        Body
+      </label>
+
+      <input type="text" id="body_box" name="query_body">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ ">
+    </div>
+
+    <div>
+      <label for="sent_or_received_at_box">
+        Sent or received at
+      </label>
+
+      <input type="datetime-local" id="sent_or_received_at_box" name="query_sent_or_received_at">
+    </div>
+
+    <button type="submit">
+      Create email message
+    </button>
+  </form>
+</article>
+
+<hr>
+
+<article>
+  <ul>
+    <% @list_of_email_messages.each do |an_email_message| %>
+      <li>
+        <a href="/email_messages/<%= an_email_message.id %>">
+          Email message #<%= an_email_message.id %>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</article>
+
+<hr>

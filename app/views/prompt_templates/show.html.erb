@@ -1,0 +1,111 @@
+<h1>
+  Prompt #<%= @the_prompt.id %> details
+</h1>
+
+<article>
+  <div>
+    <a href="/prompts">
+      Go back
+    </a>
+  </div>
+
+  <div>
+    <a href="/delete_prompt/<%= @the_prompt.id %>">
+      Delete prompt
+    </a>
+  </div>
+  <dl>
+    <dt>
+      Body
+    </dt>
+    <dd>
+      <%= @the_prompt.body %>
+    </dd>
+
+    <dt>
+      Parent prompt
+    </dt>
+    <dd>
+      <%= @the_prompt.parent_prompt_id %>
+    </dd>
+
+    <dt>
+      User
+    </dt>
+    <dd>
+      <%= @the_prompt.user_id %>
+    </dd>
+
+    <dt>
+      Source
+    </dt>
+    <dd>
+      <%= @the_prompt.source %>
+    </dd>
+
+    <dt>
+      Created at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_prompt.created_at) %> ago
+    </dd>
+
+    <dt>
+      Updated at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_prompt.updated_at) %> ago
+    </dd>
+  </dl>
+</article>
+
+<hr>
+
+
+<article>
+  <header>
+    <h2>
+      Edit prompt
+    </h2>
+  </header>
+
+  <form action="/modify_prompt/<%= @the_prompt.id %>"  method="post" >
+    <div>
+      <label for="body_box">
+        Body
+      </label>
+
+      <input type="text" id="body_box" name="query_body" value="<%= @the_prompt.body %>">
+    </div>
+
+    <div>
+      <label for="parent_prompt_id_box">
+        Parent prompt
+      </label>
+
+      <input type="text" id="parent_prompt_id_box" name="query_parent_prompt_id" value="<%= @the_prompt.parent_prompt_id %>">
+    </div>
+
+    <div>
+      <label for="user_id_box">
+        User
+      </label>
+
+      <input type="text" id="user_id_box" name="query_user_id" value="<%= @the_prompt.user_id %>">
+    </div>
+
+    <div>
+      <label for="source_box">
+        Source
+      </label>
+
+      <input type="text" id="source_box" name="query_source" value="<%= @the_prompt.source %>">
+    </div>
+
+    <button type="submit">
+      Update prompt
+    </button>
+  </form>
+</article>
+
+<hr>

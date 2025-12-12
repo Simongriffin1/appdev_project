@@ -1,0 +1,262 @@
+<h1>
+  Email message #<%= @the_email_message.id %> details
+</h1>
+
+<article>
+  <div>
+    <a href="/email_messages">
+      Go back
+    </a>
+  </div>
+
+  <div>
+    <a href="/delete_email_message/<%= @the_email_message.id %>">
+      Delete email message
+    </a>
+  </div>
+  <dl>
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_email_message.  %>
+    </dd>
+
+    <dt>
+      User
+    </dt>
+    <dd>
+      <%= @the_email_message.user_id %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_email_message.  %>
+    </dd>
+
+    <dt>
+      Direction
+    </dt>
+    <dd>
+      <%= @the_email_message.direction %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_email_message.  %>
+    </dd>
+
+    <dt>
+      Prompt
+    </dt>
+    <dd>
+      <%= @the_email_message.prompt_id %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_email_message.  %>
+    </dd>
+
+    <dt>
+      Journal entry
+    </dt>
+    <dd>
+      <%= @the_email_message.journal_entry_id %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_email_message.  %>
+    </dd>
+
+    <dt>
+      Subject
+    </dt>
+    <dd>
+      <%= @the_email_message.subject %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_email_message.  %>
+    </dd>
+
+    <dt>
+      Body
+    </dt>
+    <dd>
+      <%= @the_email_message.body %>
+    </dd>
+
+    <dt>
+      
+    </dt>
+    <dd>
+      <%= @the_email_message.  %>
+    </dd>
+
+    <dt>
+      Sent or received at
+    </dt>
+    <dd>
+      <%= @the_email_message.sent_or_received_at %>
+    </dd>
+
+    <dt>
+      Created at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_email_message.created_at) %> ago
+    </dd>
+
+    <dt>
+      Updated at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_email_message.updated_at) %> ago
+    </dd>
+  </dl>
+</article>
+
+<hr>
+
+
+<article>
+  <header>
+    <h2>
+      Edit email message
+    </h2>
+  </header>
+
+  <form action="/modify_email_message/<%= @the_email_message.id %>"  method="post" >
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_email_message.  %>">
+    </div>
+
+    <div>
+      <label for="user_id_box">
+        User
+      </label>
+
+      <input type="text" id="user_id_box" name="query_user_id" value="<%= @the_email_message.user_id %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_email_message.  %>">
+    </div>
+
+    <div>
+      <label for="direction_box">
+        Direction
+      </label>
+
+      <input type="text" id="direction_box" name="query_direction" value="<%= @the_email_message.direction %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_email_message.  %>">
+    </div>
+
+    <div>
+      <label for="prompt_id_box">
+        Prompt
+      </label>
+
+      <input type="text" id="prompt_id_box" name="query_prompt_id" value="<%= @the_email_message.prompt_id %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_email_message.  %>">
+    </div>
+
+    <div>
+      <label for="journal_entry_id_box">
+        Journal entry
+      </label>
+
+      <input type="text" id="journal_entry_id_box" name="query_journal_entry_id" value="<%= @the_email_message.journal_entry_id %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_email_message.  %>">
+    </div>
+
+    <div>
+      <label for="subject_box">
+        Subject
+      </label>
+
+      <input type="text" id="subject_box" name="query_subject" value="<%= @the_email_message.subject %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_email_message.  %>">
+    </div>
+
+    <div>
+      <label for="body_box">
+        Body
+      </label>
+
+      <input type="text" id="body_box" name="query_body" value="<%= @the_email_message.body %>">
+    </div>
+
+    <div>
+      <label for=" _box">
+        
+      </label>
+
+      <input type="text" id=" _box" name="query_ " value="<%= @the_email_message.  %>">
+    </div>
+
+    <div>
+      <label for="sent_or_received_at_box">
+        Sent or received at
+      </label>
+
+      <input type="datetime-local" id="sent_or_received_at_box" name="query_sent_or_received_at"
+         value="<%= @the_email_message.sent_or_received_at %>">
+    </div>
+
+    <button type="submit">
+      Update email message
+    </button>
+  </form>
+</article>
+
+<hr>
