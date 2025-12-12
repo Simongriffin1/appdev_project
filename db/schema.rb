@@ -10,15 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_12_001609) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_12_002005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "email_messages", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "direction"
-    t.bigint "prompt_id", null: false
-    t.bigint "journal_entry_id", null: false
+    t.bigint "prompt_id"
+    t.bigint "journal_entry_id"
     t.string "subject"
     t.text "body"
     t.datetime "sent_or_received_at"
@@ -52,11 +52,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_12_001609) do
 
   create_table "journal_entries", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "prompt_id", null: false
+    t.bigint "prompt_id"
     t.text "body"
-    t.string "source"
+    t.string "source", default: "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "received_at"
     t.index ["prompt_id"], name: "index_journal_entries_on_prompt_id"
     t.index ["user_id"], name: "index_journal_entries_on_user_id"
   end
@@ -68,6 +69,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_12_001609) do
     t.string "source"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "question_1"
+    t.text "question_2"
+    t.datetime "sent_at"
     t.index ["user_id"], name: "index_prompts_on_user_id"
   end
 
@@ -230,6 +234,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_12_001609) do
     t.string "prompt_channel"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "send_times"
+    t.datetime "next_prompt_at"
   end
 
   add_foreign_key "email_messages", "journal_entries"

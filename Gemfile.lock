@@ -170,6 +170,7 @@ GEM
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
+    event_stream_parser (1.0.0)
     faker (3.5.1)
       i18n (>= 1.8.11, < 2)
     faraday (2.12.2)
@@ -479,6 +480,10 @@ GEM
       rubocop-rails (>= 2.30)
     ruby-graphviz (1.2.5)
       rexml
+    ruby-openai (8.3.0)
+      event_stream_parser (>= 0.3.0, < 2.0.0)
+      faraday (>= 1)
+      faraday-multipart (>= 1)
     ruby-progressbar (1.13.0)
     ruby-vips (2.2.3)
       ffi (~> 1.12)
@@ -632,6 +637,7 @@ DEPENDENCIES
   rspec-html-matchers
   rspec-rails (~> 7.1.1)
   rubocop-rails-omakase
+  ruby-openai
   rufo
   selenium-webdriver (~> 4.11.0)
   shoulda-matchers (~> 6.4)
