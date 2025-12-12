@@ -1,0 +1,39 @@
+<h1>Entry Analysis</h1>
+
+<div style="margin-bottom: 20px;">
+  <strong>Entry Date:</strong> <%= @entry_analysis.journal_entry.created_at.to_date %>
+</div>
+
+<div style="padding: 15px; border: 1px solid #ccc; margin-bottom: 20px;">
+  <strong>Entry:</strong>
+  <p style="white-space: pre-wrap; margin: 10px 0 0 0;"><%= @entry_analysis.journal_entry.body.truncate(300) %></p>
+</div>
+
+<div style="padding: 15px; border: 1px solid #ccc; margin-bottom: 20px; background: #e8f4f8;">
+  <h2>AI Analysis</h2>
+  
+  <div style="margin-bottom: 10px;">
+    <strong>Summary:</strong>
+    <p style="margin: 5px 0;"><%= @entry_analysis.summary %></p>
+  </div>
+  
+  <div style="margin-bottom: 10px;">
+    <strong>Sentiment:</strong> <%= @entry_analysis.sentiment %>
+  </div>
+  
+  <div style="margin-bottom: 10px;">
+    <strong>Emotion:</strong> <%= @entry_analysis.emotion %>
+  </div>
+  
+  <% if @entry_analysis.keywords.present? %>
+    <div>
+      <strong>Keywords:</strong> <%= @entry_analysis.keywords %>
+    </div>
+  <% end %>
+</div>
+
+<p style="margin-top: 20px;">
+  <%= link_to "View Full Entry", journal_entry_path(@entry_analysis.journal_entry) %> |
+  <%= link_to "Back to Analyses", entry_analyses_path %> |
+  <%= link_to "Dashboard", dashboard_path %>
+</p>

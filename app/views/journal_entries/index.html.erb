@@ -1,0 +1,36 @@
+<h1>Journal Entries</h1>
+
+<% if @filtered_topic %>
+  <p>Filtered by topic: <strong><%= @filtered_topic.name %></strong></p>
+  <p><%= link_to "Show all entries", journal_entries_path %></p>
+<% end %>
+
+<% if @journal_entries.any? %>
+  <ul style="list-style: none; padding: 0;">
+    <% @journal_entries.each do |entry| %>
+      <li style="padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; background: #f9f9f9;">
+        <div style="margin-bottom: 10px;">
+          <strong><%= entry.created_at.to_date %></strong>
+          <% if entry.prompt %>
+            <div style="color: #666; font-style: italic; margin-top: 5px;">
+              Prompt: <%= entry.prompt.body.truncate(80) %>
+            </div>
+          <% end %>
+        </div>
+        <div style="margin: 10px 0;">
+          <%= entry.body.truncate(200) %>
+        </div>
+        <div>
+          <%= link_to "View full entry", journal_entry_path(entry) %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No entries yet.</p>
+<% end %>
+
+<p style="margin-top: 20px;">
+  <%= link_to "Back to Dashboard", dashboard_path %> |
+  <%= link_to "Topics", topics_path %>
+</p>

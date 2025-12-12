@@ -39,3 +39,8 @@ examples.txt
 
 # Ignore public uploads
 /public/uploads/*
+
+# Ignore Cursor and other AI tool directories
+.cursor
+.cursorrules
+.cursorignore

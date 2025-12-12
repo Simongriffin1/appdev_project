@@ -1,0 +1,26 @@
+<h1>Email Messages</h1>
+
+<% if @email_messages.any? %>
+  <ul style="list-style: none; padding: 0;">
+    <% @email_messages.each do |message| %>
+      <li style="padding: 15px; margin-bottom: 15px; border: 1px solid #ddd;">
+        <div>
+          <strong><%= message.direction %></strong> - 
+          <%= message.subject || "(No subject)" %>
+        </div>
+        <div style="color: #666; font-size: 0.9em;">
+          <%= message.sent_or_received_at || message.created_at %>
+        </div>
+        <div style="margin-top: 10px;">
+          <%= link_to "View Details", email_message_path(message) %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No email messages yet.</p>
+<% end %>
+
+<p style="margin-top: 20px;">
+  <%= link_to "Back to Dashboard", dashboard_path %>
+</p>

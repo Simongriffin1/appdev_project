@@ -1,0 +1,25 @@
+<h1>Topic: <%= @topic.name %></h1>
+
+<p><%= link_to "Back to Topics", topics_path %></p>
+
+<h2>Entries with this topic</h2>
+
+<% if @journal_entries.any? %>
+  <ul style="list-style: none; padding: 0;">
+    <% @journal_entries.each do |entry| %>
+      <li style="padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; background: #f9f9f9;">
+        <div style="margin-bottom: 10px;">
+          <strong><%= entry.created_at.to_date %></strong>
+        </div>
+        <div style="margin: 10px 0;">
+          <%= entry.body.truncate(200) %>
+        </div>
+        <div>
+          <%= link_to "View full entry", journal_entry_path(entry) %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No entries with this topic.</p>
+<% end %>

@@ -1,0 +1,19 @@
+<h1>Topics</h1>
+
+<% if @topics.any? %>
+  <ul style="list-style: none; padding: 0;">
+    <% @topics.each do |topic| %>
+      <li style="padding: 10px; margin-bottom: 5px; border: 1px solid #ddd;">
+        <%= link_to topic.name, journal_entries_path(topic_id: topic.id) %>
+        (<%= topic.journal_entries.count %> entries)
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No topics yet. Topics will be created automatically when entries are analyzed.</p>
+<% end %>
+
+<p style="margin-top: 20px;">
+  <%= link_to "Back to Dashboard", dashboard_path %> |
+  <%= link_to "All Entries", journal_entries_path %>
+</p>

@@ -1,5 +1,8 @@
 require "active_support/core_ext/integer/time"
 
+# SECRET_KEY_BASE should be set via environment variable in production
+# Render will automatically generate this if configured in render.yaml
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 

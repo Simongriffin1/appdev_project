@@ -12,15 +12,15 @@ Rails.application.routes.draw do
   root "dashboard#show"
 
   # Prompts with generate action
-  resources :prompts do
+  resources :prompts, only: [:index, :show] do
     post :generate, on: :collection
   end
 
   # Journal entries
-  resources :journal_entries
+  resources :journal_entries, only: [:index, :show, :new, :create]
 
   # Topics
-  resources :topics, only: [:index]
+  resources :topics, only: [:index, :show]
 
   # Entry analyses (read-only)
   resources :entry_analyses, only: [:index, :show]

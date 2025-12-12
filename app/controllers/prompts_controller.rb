@@ -1,6 +1,6 @@
 class PromptsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_prompt, only: [:show, :edit, :update, :destroy]
+  before_action :set_prompt, only: [:show]
 
   def index
     @prompts = current_user.prompts.order(created_at: :desc)

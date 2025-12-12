@@ -1,0 +1,29 @@
+<h1>Entry Analyses</h1>
+
+<% if @entry_analyses.any? %>
+  <ul style="list-style: none; padding: 0;">
+    <% @entry_analyses.each do |analysis| %>
+      <li style="padding: 15px; margin-bottom: 15px; border: 1px solid #ddd;">
+        <div>
+          <strong>Entry from:</strong> <%= analysis.journal_entry.created_at.to_date %>
+        </div>
+        <div style="margin: 5px 0;">
+          <strong>Summary:</strong> <%= analysis.summary %>
+        </div>
+        <div>
+          <strong>Sentiment:</strong> <%= analysis.sentiment %> |
+          <strong>Emotion:</strong> <%= analysis.emotion %>
+        </div>
+        <div style="margin-top: 10px;">
+          <%= link_to "View Entry", journal_entry_path(analysis.journal_entry) %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No analyses yet.</p>
+<% end %>
+
+<p style="margin-top: 20px;">
+  <%= link_to "Back to Dashboard", dashboard_path %>
+</p>
