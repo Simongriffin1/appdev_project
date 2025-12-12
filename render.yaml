@@ -12,9 +12,13 @@ services:
         sync: false
       - key: RAILS_ENV
         value: production
+      - key: RAILS_MAX_THREADS
+        value: 5
+      - key: RAILS_LOG_LEVEL
+        value: info
       - key: WEB_CONCURRENCY
         value: 2
+      - key: PORT
+        value: 3000
       - key: OPENAI_API_KEY
         sync: false
-        # Add your OpenAI API key in Render dashboard under Environment Variables
-        # Do NOT put the actual key value here in the YAML file
