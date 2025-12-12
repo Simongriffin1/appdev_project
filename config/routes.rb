@@ -1,14 +1,14 @@
 Rails.application.routes.draw do
   # Authentication routes
-  get "/sign_in" => "sessions#new"
+  get "/sign_in" => "sessions#new", as: :sign_in
   post "/sign_in" => "sessions#create"
-  delete "/sign_out" => "sessions#destroy"
+  delete "/sign_out" => "sessions#destroy", as: :sign_out
 
   # User sign-up
   resources :users, only: [:new, :create]
 
   # Dashboard (root)
-  get "/dashboard" => "dashboard#show"
+  get "/dashboard" => "dashboard#show", as: :dashboard
   root "dashboard#show"
 
   # Prompts with generate action

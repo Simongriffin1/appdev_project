@@ -3,7 +3,7 @@ class JournalEntriesController < ApplicationController
 
   def index
     if params[:topic_id].present?
-      topic = current_user.topics.find(params[:topic_id])
+      topic = current_user.topics.find(params[:topic_id].to_i)
       @journal_entries = current_user.journal_entries
         .joins(:entry_topics)
         .where(entry_topics: { topic_id: topic.id })
@@ -22,7 +22,7 @@ class JournalEntriesController < ApplicationController
 
   def new
     @journal_entry = current_user.journal_entries.new
-    @journal_entry.prompt_id = params[:prompt_id] if params[:prompt_id].present?
+    @journal_entry.prompt_id = params[:prompt_id].to_i if params[:prompt_id].present?
   end
 
   def create
@@ -31,7 +31,7 @@ class JournalEntriesController < ApplicationController
     if @journal_entry.save
       # Trigger AI analysis
       EntryAnalysisGenerator.new(@journal_entry).generate!
-      
+
       redirect_to @journal_entry, notice: "Journal entry created successfully."
     else
       # If coming from a prompt, set up the prompt context for re-rendering
@@ -40,7 +40,8 @@ class JournalEntriesController < ApplicationController
         if @prompt
           render "prompts/show", status: :unprocessable_entity
         else
-          # Prompt was deleted or invalid, fall back to standard form
+          # Prompt was deleted or invalid, clear prompt_id and fall back to standard form
+          @journal_entry.prompt_id = nil
           render :new, status: :unprocessable_entity
         end
       else

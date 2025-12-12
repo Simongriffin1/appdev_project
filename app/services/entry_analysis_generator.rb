@@ -79,7 +79,7 @@ class EntryAnalysisGenerator
     return fallback_analysis if json_text.blank?
 
     # Try to extract JSON from the response (in case there's extra text)
-    json_match = json_text.match(/\{.*\}/m)
+    json_match = json_text.match(/\{.*?\}/m)
     json_text = json_match[0] if json_match
     return fallback_analysis if json_text.blank?
 
