@@ -35,7 +35,13 @@ class JournalEntriesController < ApplicationController
       
       redirect_to @journal_entry, notice: "Journal entry created successfully."
     else
-      render :new, status: :unprocessable_entity
+      # If coming from a prompt, set up the prompt context for re-rendering
+      if @journal_entry.prompt_id.present?
+        @prompt = current_user.prompts.find(@journal_entry.prompt_id)
+        render "prompts/show", status: :unprocessable_entity
+      else
+        render :new, status: :unprocessable_entity
+      end
     end
   end
 

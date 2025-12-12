@@ -8,5 +8,6 @@ class User < ApplicationRecord
 
   # You can get entry_analyses through journal_entries if needed:
   has_many :entry_analyses, through: :journal_entries
-end
 
+  validates :email, presence: true, uniqueness: true
+end

@@ -1,15 +1,15 @@
 Rails.application.routes.draw do
   # Authentication routes
-  get "/sign_in", to: "sessions#new", as: :sign_in
-  post "/sign_in", to: "sessions#create"
-  delete "/sign_out", to: "sessions#destroy", as: :sign_out
-
-  # Dashboard (homepage)
-  root "dashboard#show"
-  get "/dashboard", to: "dashboard#show", as: :dashboard
+  get "/sign_in" => "sessions#new"
+  post "/sign_in" => "sessions#create"
+  delete "/sign_out" => "sessions#destroy"
 
   # User sign-up
   resources :users, only: [:new, :create]
+
+  # Dashboard (root)
+  get "/dashboard" => "dashboard#show"
+  root "dashboard#show"
 
   # Prompts with generate action
   resources :prompts do
@@ -19,8 +19,8 @@ Rails.application.routes.draw do
   # Journal entries
   resources :journal_entries
 
-  # Topics (read-only for now)
-  resources :topics, only: [:index, :show]
+  # Topics
+  resources :topics, only: [:index]
 
   # Entry analyses (read-only)
   resources :entry_analyses, only: [:index, :show]

@@ -1,62 +1,24 @@
 class UsersController < ApplicationController
-  def index
-    matching_users = User.all
+  skip_before_action :authenticate_user!, only: [:new, :create]
 
-    @list_of_users = matching_users.order({ :created_at => :desc })
-
-    render({ :template => "user_templates/index" })
-  end
-
-  def show
-    the_id = params.fetch("path_id")
-
-    matching_users = User.where({ :id => the_id })
-
-    @the_user = matching_users.at(0)
-
-    render({ :template => "user_templates/show" })
+  def new
+    @user = User.new
   end
 
   def create
-    the_user = User.new
-    the_user.email = params.fetch("query_email")
-    the_user.password_digest = params.fetch("query_password_digest")
-    the_user.time_zone = params.fetch("query_time_zone")
-    the_user.prompt_frequency = params.fetch("query_prompt_frequency")
-    the_user.prompt_channel = params.fetch("query_prompt_channel")
+    @user = User.new(user_params)
 
-    if the_user.valid?
-      the_user.save
-      redirect_to("/users", { :notice => "User created successfully." })
+    if @user.save
+      session[:user_id] = @user.id
+      redirect_to dashboard_path, notice: "Account created successfully. Welcome!"
     else
-      redirect_to("/users", { :alert => the_user.errors.full_messages.to_sentence })
+      render :new, status: :unprocessable_entity
     end
   end
 
-  def update
-    the_id = params.fetch("path_id")
-    the_user = User.where({ :id => the_id }).at(0)
+  private
 
-    the_user.email = params.fetch("query_email")
-    the_user.password_digest = params.fetch("query_password_digest")
-    the_user.time_zone = params.fetch("query_time_zone")
-    the_user.prompt_frequency = params.fetch("query_prompt_frequency")
-    the_user.prompt_channel = params.fetch("query_prompt_channel")
-
-    if the_user.valid?
-      the_user.save
-      redirect_to("/users/#{the_user.id}", { :notice => "User updated successfully." } )
-    else
-      redirect_to("/users/#{the_user.id}", { :alert => the_user.errors.full_messages.to_sentence })
-    end
-  end
-
-  def destroy
-    the_id = params.fetch("path_id")
-    the_user = User.where({ :id => the_id }).at(0)
-
-    the_user.destroy
-
-    redirect_to("/users", { :notice => "User deleted successfully." } )
+  def user_params
+    params.require(:user).permit(:email, :password, :password_confirmation, :time_zone, :prompt_frequency, :prompt_channel)
   end
 end
