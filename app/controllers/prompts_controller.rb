@@ -1,60 +1,23 @@
 class PromptsController < ApplicationController
+  before_action :authenticate_user!
+  before_action :set_prompt, only: [:show, :edit, :update, :destroy]
+
   def index
-    matching_prompts = Prompt.all
-
-    @list_of_prompts = matching_prompts.order({ :created_at => :desc })
-
-    render({ :template => "prompt_templates/index" })
+    @prompts = current_user.prompts.order(created_at: :desc)
   end
 
   def show
-    the_id = params.fetch("path_id")
-
-    matching_prompts = Prompt.where({ :id => the_id })
-
-    @the_prompt = matching_prompts.at(0)
-
-    render({ :template => "prompt_templates/show" })
+    @journal_entry = current_user.journal_entries.new(prompt: @prompt)
   end
 
-  def create
-    the_prompt = Prompt.new
-    the_prompt.body = params.fetch("query_body")
-    the_prompt.parent_prompt_id = params.fetch("query_parent_prompt_id")
-    the_prompt.user_id = params.fetch("query_user_id")
-    the_prompt.source = params.fetch("query_source")
-
-    if the_prompt.valid?
-      the_prompt.save
-      redirect_to("/prompts", { :notice => "Prompt created successfully." })
-    else
-      redirect_to("/prompts", { :alert => the_prompt.errors.full_messages.to_sentence })
-    end
+  def generate
+    prompt = PromptGenerator.new(current_user).generate!
+    redirect_to prompt_path(prompt), notice: "New prompt generated."
   end
 
-  def update
-    the_id = params.fetch("path_id")
-    the_prompt = Prompt.where({ :id => the_id }).at(0)
+  private
 
-    the_prompt.body = params.fetch("query_body")
-    the_prompt.parent_prompt_id = params.fetch("query_parent_prompt_id")
-    the_prompt.user_id = params.fetch("query_user_id")
-    the_prompt.source = params.fetch("query_source")
-
-    if the_prompt.valid?
-      the_prompt.save
-      redirect_to("/prompts/#{the_prompt.id}", { :notice => "Prompt updated successfully." } )
-    else
-      redirect_to("/prompts/#{the_prompt.id}", { :alert => the_prompt.errors.full_messages.to_sentence })
-    end
-  end
-
-  def destroy
-    the_id = params.fetch("path_id")
-    the_prompt = Prompt.where({ :id => the_id }).at(0)
-
-    the_prompt.destroy
-
-    redirect_to("/prompts", { :notice => "Prompt deleted successfully." } )
+  def set_prompt
+    @prompt = current_user.prompts.find(params[:id])
   end
 end

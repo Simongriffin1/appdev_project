@@ -1,60 +1,51 @@
 class JournalEntriesController < ApplicationController
+  before_action :authenticate_user!
+  before_action :set_journal_entry, only: [:show]
+
   def index
-    matching_journal_entries = JournalEntry.all
-
-    @list_of_journal_entries = matching_journal_entries.order({ :created_at => :desc })
-
-    render({ :template => "journal_entry_templates/index" })
+    if params[:topic_id].present?
+      topic = current_user.topics.find(params[:topic_id])
+      @journal_entries = current_user.journal_entries
+        .joins(:entry_topics)
+        .where(entry_topics: { topic_id: topic.id })
+        .includes(:prompt, :entry_analysis)
+        .order(created_at: :desc)
+      @filtered_topic = topic
+    else
+      @journal_entries = current_user.journal_entries
+        .includes(:prompt, :entry_analysis)
+        .order(created_at: :desc)
+    end
   end
 
   def show
-    the_id = params.fetch("path_id")
+  end
 
-    matching_journal_entries = JournalEntry.where({ :id => the_id })
-
-    @the_journal_entry = matching_journal_entries.at(0)
-
-    render({ :template => "journal_entry_templates/show" })
+  def new
+    @journal_entry = current_user.journal_entries.new
+    @journal_entry.prompt_id = params[:prompt_id] if params[:prompt_id].present?
   end
 
   def create
-    the_journal_entry = JournalEntry.new
-    the_journal_entry.user_id = params.fetch("query_user_id")
-    the_journal_entry.prompt_id = params.fetch("query_prompt_id")
-    the_journal_entry.body = params.fetch("query_body")
-    the_journal_entry.source = params.fetch("query_source")
+    @journal_entry = current_user.journal_entries.new(journal_entry_params)
 
-    if the_journal_entry.valid?
-      the_journal_entry.save
-      redirect_to("/journal_entries", { :notice => "Journal entry created successfully." })
+    if @journal_entry.save
+      # Trigger AI analysis
+      EntryAnalysisGenerator.new(@journal_entry).generate!
+      
+      redirect_to @journal_entry, notice: "Journal entry created successfully."
     else
-      redirect_to("/journal_entries", { :alert => the_journal_entry.errors.full_messages.to_sentence })
+      render :new, status: :unprocessable_entity
     end
   end
 
-  def update
-    the_id = params.fetch("path_id")
-    the_journal_entry = JournalEntry.where({ :id => the_id }).at(0)
+  private
 
-    the_journal_entry.user_id = params.fetch("query_user_id")
-    the_journal_entry.prompt_id = params.fetch("query_prompt_id")
-    the_journal_entry.body = params.fetch("query_body")
-    the_journal_entry.source = params.fetch("query_source")
-
-    if the_journal_entry.valid?
-      the_journal_entry.save
-      redirect_to("/journal_entries/#{the_journal_entry.id}", { :notice => "Journal entry updated successfully." } )
-    else
-      redirect_to("/journal_entries/#{the_journal_entry.id}", { :alert => the_journal_entry.errors.full_messages.to_sentence })
-    end
+  def set_journal_entry
+    @journal_entry = current_user.journal_entries.find(params[:id])
   end
 
-  def destroy
-    the_id = params.fetch("path_id")
-    the_journal_entry = JournalEntry.where({ :id => the_id }).at(0)
-
-    the_journal_entry.destroy
-
-    redirect_to("/journal_entries", { :notice => "Journal entry deleted successfully." } )
+  def journal_entry_params
+    params.require(:journal_entry).permit(:prompt_id, :body, :source)
   end
 end

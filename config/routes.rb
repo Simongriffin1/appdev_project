@@ -1,137 +1,30 @@
 Rails.application.routes.draw do
-  # Routes for the Email message resource:
+  # Authentication routes
+  get "/sign_in", to: "sessions#new", as: :sign_in
+  post "/sign_in", to: "sessions#create"
+  delete "/sign_out", to: "sessions#destroy", as: :sign_out
 
-  # CREATE
-  post("/insert_email_message", { :controller => "email_messages", :action => "create" })
+  # Dashboard (homepage)
+  root "dashboard#show"
+  get "/dashboard", to: "dashboard#show", as: :dashboard
 
-  # READ
-  get("/email_messages", { :controller => "email_messages", :action => "index" })
+  # User sign-up
+  resources :users, only: [:new, :create]
 
-  get("/email_messages/:path_id", { :controller => "email_messages", :action => "show" })
+  # Prompts with generate action
+  resources :prompts do
+    post :generate, on: :collection
+  end
 
-  # UPDATE
+  # Journal entries
+  resources :journal_entries
 
-  post("/modify_email_message/:path_id", { :controller => "email_messages", :action => "update" })
+  # Topics (read-only for now)
+  resources :topics, only: [:index, :show]
 
-  # DELETE
-  get("/delete_email_message/:path_id", { :controller => "email_messages", :action => "destroy" })
+  # Entry analyses (read-only)
+  resources :entry_analyses, only: [:index, :show]
 
-  #------------------------------
-
-  # Routes for the Entry analysis resource:
-
-  # CREATE
-  post("/insert_entry_analysis", { :controller => "entry_analyses", :action => "create" })
-
-  # READ
-  get("/entry_analyses", { :controller => "entry_analyses", :action => "index" })
-
-  get("/entry_analyses/:path_id", { :controller => "entry_analyses", :action => "show" })
-
-  # UPDATE
-
-  post("/modify_entry_analysis/:path_id", { :controller => "entry_analyses", :action => "update" })
-
-  # DELETE
-  get("/delete_entry_analysis/:path_id", { :controller => "entry_analyses", :action => "destroy" })
-
-  #------------------------------
-
-  # Routes for the Entry topic resource:
-
-  # CREATE
-  post("/insert_entry_topic", { :controller => "entry_topics", :action => "create" })
-
-  # READ
-  get("/entry_topics", { :controller => "entry_topics", :action => "index" })
-
-  get("/entry_topics/:path_id", { :controller => "entry_topics", :action => "show" })
-
-  # UPDATE
-
-  post("/modify_entry_topic/:path_id", { :controller => "entry_topics", :action => "update" })
-
-  # DELETE
-  get("/delete_entry_topic/:path_id", { :controller => "entry_topics", :action => "destroy" })
-
-  #------------------------------
-
-  # Routes for the Topic resource:
-
-  # CREATE
-  post("/insert_topic", { :controller => "topics", :action => "create" })
-
-  # READ
-  get("/topics", { :controller => "topics", :action => "index" })
-
-  get("/topics/:path_id", { :controller => "topics", :action => "show" })
-
-  # UPDATE
-
-  post("/modify_topic/:path_id", { :controller => "topics", :action => "update" })
-
-  # DELETE
-  get("/delete_topic/:path_id", { :controller => "topics", :action => "destroy" })
-
-  #------------------------------
-
-  # Routes for the Journal entry resource:
-
-  # CREATE
-  post("/insert_journal_entry", { :controller => "journal_entries", :action => "create" })
-
-  # READ
-  get("/journal_entries", { :controller => "journal_entries", :action => "index" })
-
-  get("/journal_entries/:path_id", { :controller => "journal_entries", :action => "show" })
-
-  # UPDATE
-
-  post("/modify_journal_entry/:path_id", { :controller => "journal_entries", :action => "update" })
-
-  # DELETE
-  get("/delete_journal_entry/:path_id", { :controller => "journal_entries", :action => "destroy" })
-
-  #------------------------------
-
-  # Routes for the Prompt resource:
-
-  # CREATE
-  post("/insert_prompt", { :controller => "prompts", :action => "create" })
-
-  # READ
-  get("/prompts", { :controller => "prompts", :action => "index" })
-
-  get("/prompts/:path_id", { :controller => "prompts", :action => "show" })
-
-  # UPDATE
-
-  post("/modify_prompt/:path_id", { :controller => "prompts", :action => "update" })
-
-  # DELETE
-  get("/delete_prompt/:path_id", { :controller => "prompts", :action => "destroy" })
-
-  #------------------------------
-
-  # Routes for the User resource:
-
-  # CREATE
-  post("/insert_user", { :controller => "users", :action => "create" })
-
-  # READ
-  get("/users", { :controller => "users", :action => "index" })
-
-  get("/users/:path_id", { :controller => "users", :action => "show" })
-
-  # UPDATE
-
-  post("/modify_user/:path_id", { :controller => "users", :action => "update" })
-
-  # DELETE
-  get("/delete_user/:path_id", { :controller => "users", :action => "destroy" })
-
-  #------------------------------
-
-  # This is a blank app! Pick your first screen, build out the RCAV, and go from there. E.g.:
-  # get("/your_first_screen", { :controller => "pages", :action => "first" })
+  # Email messages (read-only for debugging)
+  resources :email_messages, only: [:index, :show]
 end
