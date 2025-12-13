@@ -1,27 +1,21 @@
 class JournalReplyMailbox < ApplicationMailbox
-  # Match emails sent to reply+token@domain
-  routing(/^reply\+([^@]+)@/i => :journal_reply)
-
-  def journal_reply
-    # Extract token from the routing match (from To or Reply-To)
+  # Called when ApplicationMailbox routes an email to :journal_reply
+  def process
     token = extract_token
-    
     return bounce_with("Invalid reply token") unless token
-    
-    # Verify and decode the token
+
     user_id, prompt_id = verify_token(token)
     return bounce_with("Invalid or expired token") unless user_id && prompt_id
-    
+
     user = User.find_by(id: user_id)
     return bounce_with("User not found") unless user
-    
+
     prompt = Prompt.find_by(id: prompt_id, user_id: user_id)
     return bounce_with("Prompt not found") unless prompt
-    
-    # Extract the email body (prefer plain text, fallback to HTML)
-    body = mail.text_part&.decoded || mail.html_part&.decoded || mail.body.decoded
-    
-    # Create journal entry
+
+    body = extract_body
+    return bounce_with("Empty reply") if body.blank?
+
     journal_entry = JournalEntry.create!(
       user: user,
       prompt: prompt,
@@ -29,8 +23,7 @@ class JournalReplyMailbox < ApplicationMailbox
       source: "email",
       received_at: mail.date || Time.current
     )
-    
-    # Log inbound email
+
     EmailMessage.create!(
       user: user,
       direction: "inbound",
@@ -40,27 +33,29 @@ class JournalReplyMailbox < ApplicationMailbox
       body: body,
       sent_or_received_at: mail.date || Time.current
     )
-    
-    # Trigger entry analysis generation
+
     EntryAnalysisGenerator.new(journal_entry).generate!
   end
 
   private
 
   def extract_token
-    # Try Reply-To first, then To
+    # Prefer Reply-To (how many clients respond), else fall back to To
     address = mail.reply_to&.first || mail.to&.first
     return nil unless address
-    
+
     match = address.match(/^reply\+([^@]+)@/i)
     match ? match[1] : nil
   end
 
+  def extract_body
+    # Prefer plain text. Fallback to HTML then raw body.
+    mail.text_part&.decoded || mail.html_part&.decoded || mail.body&.decoded
+  end
+
   def verify_token(token)
-    verifier = Rails.application.message_verifier(:journal_reply)
-    verifier.verify(token)
-  rescue
-    ActiveSupport::MessageVerifier::InvalidSignature
-  [nil, nil]
-end
+    Rails.application.message_verifier(:journal_reply).verify(token)
+  rescue ActiveSupport::MessageVerifier::InvalidSignature
+    [nil, nil]
+  end
 end

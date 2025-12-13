@@ -4,7 +4,9 @@ class PromptMailer < ApplicationMailer
     @user = @prompt.user
 
     token = Rails.application.message_verifier(:journal_reply).generate([@user.id, @prompt.id])
-    inbound_domain = ENV.fetch("INBOUND_EMAIL_DOMAIN", "example.com")
+    # In development you typically want this to be "localhost" so ActionMailbox Conductor
+    # can deliver messages to reply+TOKEN@localhost.
+    inbound_domain = ENV.fetch("MAIL_DOMAIN", "localhost")
     reply_address = "reply+#{token}@#{inbound_domain}"
 
     mail(

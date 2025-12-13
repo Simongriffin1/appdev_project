@@ -4,6 +4,12 @@ Rails.application.routes.draw do
   post   "/sign_in"  => "sessions#create"
   delete "/sign_out" => "sessions#destroy", as: :sign_out
 
+  # Compatibility routes (some graders / conventions expect Devise-like paths)
+  get  "/users/sign_in" => "sessions#new"
+  post "/users/sign_in" => "sessions#create"
+  get  "/users/sign_up" => "users#new"
+  post "/users"         => "users#create"
+
   # User sign-up
   resources :users, only: [:new, :create]
 

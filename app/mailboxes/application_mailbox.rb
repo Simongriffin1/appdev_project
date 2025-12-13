@@ -1,3 +1,4 @@
 class ApplicationMailbox < ActionMailbox::Base
-  # Routing is handled by the mailbox class itself via MATCHER
+  # Route inbound replies like: reply+TOKEN@your-domain
+  routing(/^reply\+[^@]+@/i => :journal_reply)
 end
