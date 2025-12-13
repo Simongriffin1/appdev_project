@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id               :bigint           not null, primary key
+#  email            :string
+#  next_prompt_at   :datetime
+#  password_digest  :string
+#  prompt_channel   :string
+#  prompt_frequency :string
+#  send_times       :string
+#  time_zone        :string
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#
 class User < ApplicationRecord
   has_secure_password
 

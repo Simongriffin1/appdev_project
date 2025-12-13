@@ -73,7 +73,8 @@ Rails.application.configure do
     # Fall back to file delivery if SMTP not configured
     config.action_mailer.delivery_method = :file
     config.action_mailer.file_settings = { location: Rails.root.join("tmp", "mail") }
-    Rails.logger.warn "SMTP not configured. Set SMTP_ADDRESS/SMTP_USERNAME/SMTP_PASSWORD in .env to send real emails."
+    Kernel.warn "SMTP not configured. Set SMTP_ADDRESS/SMTP_USERNAME/SMTP_PASSWORD in .env to send real emails."
+    config.action_mailer.perform_deliveries = false
   end
 
   # Print deprecation notices to the Rails logger.

@@ -1,31 +1,28 @@
 <h1 class="page-title">Welcome back, <%= current_user.email %></h1>
 <p class="muted">Your email-first AI journaling space. Reply to your prompt emails to create entries.</p>
 
+<% user_tz = (current_user.time_zone.presence || "UTC") %>
+
 <div class="card-grid">
   <!-- Email Schedule -->
   <section class="card">
     <h2 class="card__title">Email Schedule</h2>
+
     <% if current_user.onboarding_complete? %>
       <p class="card__subtitle">
-        <% if current_user.next_prompt_at %>
-          Next email: <%= current_user.next_prompt_at.in_time_zone(current_user.time_zone).strftime("%B %-d at %-I:%M %p") %>
+        <% if current_user.next_prompt_at.present? %>
+          Next email:
+          <%= current_user.next_prompt_at.in_time_zone(user_tz).strftime("%B %-d at %-I:%M %p") %>
         <% else %>
           Schedule not set
         <% end %>
       </p>
-      
+
       <div class="btn-row">
         <%= form_with url: send_prompt_path, method: :post, class: "inline-form" do |f| %>
           <%= f.submit "Send me my next email now", class: "btn btn-primary" %>
         <% end %>
 
-        <%= form_with url: send_prompt_path, method: :post, class: "inline-form" do |f| %>
-          <%= f.hidden_field :prompt_id, value: @latest_prompt.id %>
-          <%= f.submit "Send me my next email now", class: "btn btn-ghost" %>
-        <% end %>
-      </div>
-      
-      <div class="btn-row" style="margin-top: 0.5rem;">
         <%= link_to "Update settings", settings_path, class: "btn btn-ghost" %>
       </div>
     <% else %>
@@ -39,18 +36,23 @@
   <!-- Last prompt sent -->
   <section class="card">
     <h2 class="card__title">Last prompt sent</h2>
+
     <% last_sent_prompt = current_user.prompts.where.not(sent_at: nil).order(sent_at: :desc).first %>
-    <% if last_sent_prompt %>
+
+    <% if last_sent_prompt.present? %>
       <p class="card__subtitle">
-        Sent <%= last_sent_prompt.sent_at.in_time_zone(current_user.time_zone || "UTC").strftime("%B %-d at %-I:%M %p") %>
+        Sent <%= last_sent_prompt.sent_at.in_time_zone(user_tz).strftime("%B %-d at %-I:%M %p") %>
       </p>
+
       <div style="margin-top: 1rem;">
         <% if last_sent_prompt.question_1.present? %>
           <p><strong>Question 1:</strong> <%= last_sent_prompt.question_1 %></p>
         <% end %>
+
         <% if last_sent_prompt.question_2.present? %>
           <p><strong>Question 2:</strong> <%= last_sent_prompt.question_2 %></p>
         <% end %>
+
         <% if last_sent_prompt.question_1.blank? && last_sent_prompt.body.present? %>
           <p><%= last_sent_prompt.body %></p>
         <% end %>
@@ -64,26 +66,30 @@
   <section class="card card--full">
     <h2 class="card__title">Recent replies</h2>
 
-    <% if @recent_entries.any? %>
+    <% if @recent_entries.present? && @recent_entries.any? %>
       <ul class="entry-list">
         <% @recent_entries.each do |entry| %>
           <li class="entry-list__item">
             <div class="entry-meta">
-              <%= (entry.received_at || entry.created_at).strftime("%b %-d, %Y at %-I:%M %p") %>
-              <% if entry.prompt %>
-                <% if entry.prompt.question_1.present? %>
-                  · Reply to: "<%= entry.prompt.question_1.truncate(40) %>"
-                <% elsif entry.prompt.body.present? %>
-                  · Reply to: "<%= entry.prompt.body.truncate(40) %>"
+              <%= (entry.received_at || entry.created_at).in_time_zone(user_tz).strftime("%b %-d, %Y at %-I:%M %p") %>
+
+              <% if entry.prompt.present? %>
+                <% prompt_text =
+                    entry.prompt.question_1.presence ||
+                    entry.prompt.body.presence %>
+
+                <% if prompt_text.present? %>
+                  · Reply to: "<%= prompt_text.truncate(40) %>"
                 <% end %>
               <% end %>
+
               <% if entry.source == "email" %>
                 <span style="color: #28a745;">· Email</span>
               <% end %>
             </div>
 
             <div class="entry-body">
-              <%= entry.body.truncate(160) %>
+              <%= entry.body.to_s.truncate(160) %>
             </div>
 
             <div class="btn-row" style="margin-top: 0.4rem;">
@@ -94,6 +100,9 @@
       </ul>
     <% else %>
       <p class="muted">No entries yet. Reply to your first prompt email to get started.</p>
+      <div class="btn-row" style="margin-top: 0.5rem;">
+        <%= link_to "Write an entry on the web", new_journal_entry_path, class: "btn btn-ghost" %>
+      </div>
     <% end %>
   </section>
 </div>
