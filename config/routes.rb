@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   # Dashboard (root)
   get "/dashboard" => "dashboard#show", as: :dashboard
+  post "/send_prompt" => "dashboard#send_prompt", as: :send_prompt
   root "dashboard#show"
   
   # Manual prompt sending
@@ -40,4 +41,9 @@ Rails.application.routes.draw do
 
   # Email messages (read-only for debugging)
   resources :email_messages, only: [:index, :show]
+
+  # Action Mailbox conductor (development only)
+  if Rails.env.development?
+    mount ActionMailbox::Engine => "/rails/conductor/action_mailbox"
+  end
 end

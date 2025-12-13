@@ -37,9 +37,9 @@ class PromptGenerator
 
     questions =
       if ENV["OPENAI_API_KEY"].present?
-        generate_with_openai(context, last_prompt)
+        generate_with_openai(context, last_prompt, recent_entries)
       else
-        fallback_questions(last_prompt)
+        fallback_questions(last_prompt, recent_entries)
       end
 
     Prompt.create!(
@@ -54,7 +54,7 @@ class PromptGenerator
 
   private
 
-  def generate_with_openai(context, last_prompt)
+  def generate_with_openai(context, last_prompt, recent_entries)
     require "openai"
     require "json"
 
@@ -105,25 +105,41 @@ class PromptGenerator
     )
 
     json_text = response.dig("choices", 0, "message", "content")&.strip
-    return fallback_questions(last_prompt) if json_text.blank?
+    return fallback_questions(last_prompt, recent_entries) if json_text.blank?
 
     # Try to extract JSON from the response (in case there's extra text)
     json_match = json_text.match(/\{.*?\}/m)
     json_text = json_match[0] if json_match
-    return fallback_questions(last_prompt) if json_text.blank?
+    return fallback_questions(last_prompt, recent_entries) if json_text.blank?
 
     parsed = JSON.parse(json_text)
     {
-      question_1: parsed["question_1"] || fallback_questions(last_prompt)[:question_1],
-      question_2: parsed["question_2"] || fallback_questions(last_prompt)[:question_2]
+      question_1: parsed["question_1"] || fallback_questions(last_prompt, recent_entries)[:question_1],
+      question_2: parsed["question_2"] || fallback_questions(last_prompt, recent_entries)[:question_2]
     }
   rescue StandardError => e
     Rails.logger.error "OpenAI prompt error: #{e.message}"
-    fallback_questions(last_prompt)
+    fallback_questions(last_prompt, recent_entries)
   end
 
-  def fallback_questions(last_prompt)
-    if last_prompt&.question_1.present?
+  def fallback_questions(last_prompt, recent_entries)
+    # Deterministic fallback based on recent entries
+    if recent_entries.any?
+      # Use topics from recent entries if available
+      topics = recent_entries.flat_map { |e| e.entry_analysis&.keywords&.split(", ") || [] }.compact.uniq.first(2)
+
+      if topics.any?
+        {
+          question_1: "What's been most significant about #{topics[0]} for you lately?",
+          question_2: "How has #{topics[1] || topics[0]} influenced your thoughts or actions recently?"
+        }
+      else
+        {
+          question_1: "What pattern or theme do you notice emerging from your recent reflections?",
+          question_2: "What would you like to explore deeper in your next entry?"
+        }
+      end
+    elsif last_prompt&.question_1.present?
       {
         question_1: "Thinking back to what you wrote in response to that last question, what still feels unresolved or important to you right now?",
         question_2: "What patterns or themes are you noticing in your recent reflections?"

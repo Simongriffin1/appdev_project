@@ -98,11 +98,75 @@ class EntryAnalysisGenerator
   end
 
   def fallback_analysis
+    # Deterministic analysis based on keywords and patterns
+    body_lower = @entry.body.downcase
+
+    # Detect sentiment from keywords
+    positive_words = %w[happy joy excited grateful thankful proud love amazing wonderful great good]
+    negative_words = %w[sad angry frustrated anxious worried stressed upset disappointed hurt]
+
+    positive_count = positive_words.count { |word| body_lower.include?(word) }
+    negative_count = negative_words.count { |word| body_lower.include?(word) }
+
+    sentiment = if positive_count > negative_count
+                  "positive"
+                elsif negative_count > positive_count
+                  "negative"
+                else
+                  "neutral"
+                end
+
+    # Detect emotion from keywords
+    emotion_keywords = {
+      "joy" => %w[happy joy excited thrilled delighted],
+      "anxiety" => %w[anxious worried nervous stressed tense],
+      "frustration" => %w[frustrated annoyed irritated],
+      "sadness" => %w[sad depressed down low],
+      "anger" => %w[angry mad furious],
+      "calm" => %w[calm peaceful relaxed serene],
+      "pride" => %w[proud accomplished achieved],
+      "gratitude" => %w[grateful thankful appreciate]
+    }
+
+    detected_emotion = "neutral"
+    emotion_keywords.each do |emotion, keywords|
+      if keywords.any? { |word| body_lower.include?(word) }
+        detected_emotion = emotion
+        break
+      end
+    end
+
+    # Extract simple topics from common words
+    common_topics = {
+      "work" => %w[work job office meeting project deadline],
+      "relationships" => %w[friend family partner relationship love],
+      "health" => %w[health exercise workout gym sick],
+      "travel" => %w[travel trip vacation journey],
+      "learning" => %w[learn study read book class],
+      "creativity" => %w[creative art write draw music],
+      "reflection" => %w[think reflect consider ponder]
+    }
+
+    detected_topics = []
+    common_topics.each do |topic, keywords|
+      if keywords.any? { |word| body_lower.include?(word) }
+        detected_topics << topic
+      end
+    end
+
+    # Generate a simple summary
+    first_sentence = @entry.body.split(/[.!?]/).first&.strip
+    summary = if first_sentence && first_sentence.length > 20
+                "#{first_sentence.truncate(150)}."
+              else
+                @entry.body.truncate(200)
+              end
+
     {
-      summary: @entry.body.truncate(200),
-      sentiment: "neutral",
-      emotion: "neutral",
-      topics: []
+      summary: summary,
+      sentiment: sentiment,
+      emotion: detected_emotion,
+      topics: detected_topics.first(3) # Limit to 3 topics
     }
   end
 end

@@ -18,6 +18,11 @@
         <%= form_with url: send_prompt_path, method: :post, class: "inline-form" do |f| %>
           <%= f.submit "Send me my next email now", class: "btn btn-primary" %>
         <% end %>
+
+        <%= form_with url: send_prompt_path, method: :post, class: "inline-form" do |f| %>
+          <%= f.hidden_field :prompt_id, value: @latest_prompt.id %>
+          <%= f.submit "Send me my next email now", class: "btn btn-ghost" %>
+        <% end %>
       </div>
       
       <div class="btn-row" style="margin-top: 0.5rem;">

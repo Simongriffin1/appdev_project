@@ -52,14 +52,14 @@ Rails.application.configure do
   # Action Mailer (SMTP / Gmail)
   # ----------------------------
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.raise_delivery_errors = false
 
   smtp_address  = ENV["SMTP_ADDRESS"]
   smtp_username = ENV["SMTP_USERNAME"]
   smtp_password = ENV["SMTP_PASSWORD"]
 
   if smtp_address.present? && smtp_username.present? && smtp_password.present?
+    config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
       address: smtp_address,
       port: (ENV["SMTP_PORT"] || "587").to_i,
@@ -70,9 +70,10 @@ Rails.application.configure do
       enable_starttls_auto: (ENV["SMTP_ENABLE_STARTTLS_AUTO"] || "true") == "true"
     }
   else
-    # Don't crash if SMTP isn't configured yet
+    # Fall back to file delivery if SMTP not configured
+    config.action_mailer.delivery_method = :file
+    config.action_mailer.file_settings = { location: Rails.root.join("tmp", "mail") }
     Rails.logger.warn "SMTP not configured. Set SMTP_ADDRESS/SMTP_USERNAME/SMTP_PASSWORD in .env to send real emails."
-    config.action_mailer.perform_deliveries = false
   end
 
   # Print deprecation notices to the Rails logger.
