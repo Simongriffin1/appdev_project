@@ -37,7 +37,9 @@ class JournalEntriesController < ApplicationController
       # If coming from a prompt, set up the prompt context for re-rendering
       if @journal_entry.prompt_id.present?
         @prompt = current_user.prompts.find_by(id: @journal_entry.prompt_id)
-        if @prompt
+        if @prompt.present?
+          # Ensure both @prompt and @journal_entry are set for the prompts/show template
+          # The template expects both variables to be available
           render "prompts/show", status: :unprocessable_entity
         else
           # Prompt was deleted or invalid, clear prompt_id and fall back to standard form

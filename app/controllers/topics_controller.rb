@@ -1,6 +1,11 @@
 class TopicsController < ApplicationController
   def index
-    @topics = current_user.topics.order(:name)
+    # Preload journal entry counts to avoid N+1 queries
+    @topics = current_user.topics
+      .left_outer_joins(:entry_topics)
+      .select("topics.*, COUNT(entry_topics.id) as journal_entries_count")
+      .group("topics.id")
+      .order(:name)
   end
 
   def show

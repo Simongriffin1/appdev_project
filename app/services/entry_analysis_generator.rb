@@ -80,8 +80,8 @@ class EntryAnalysisGenerator
     return fallback_analysis if json_text.blank?
 
     # Try to extract JSON from the response (in case there's extra text)
-    json_match = json_text.match(/\{.*?\}/m)
-    json_text = json_match[0] if json_match
+    # Use a balanced brace matcher to handle nested structures (arrays, objects)
+    json_text = extract_json_object(json_text)
     return fallback_analysis if json_text.blank?
 
     parsed = JSON.parse(json_text)
@@ -95,6 +95,50 @@ class EntryAnalysisGenerator
   rescue StandardError => e
     Rails.logger.error "OpenAI API error: #{e.message}"
     fallback_analysis
+  end
+
+  def extract_json_object(text)
+    # Find the first opening brace
+    start_idx = text.index("{")
+    return nil unless start_idx
+
+    # Count braces to find the matching closing brace
+    brace_count = 0
+    in_string = false
+    escape_next = false
+
+    (start_idx...text.length).each do |i|
+      char = text[i]
+
+      if escape_next
+        escape_next = false
+        next
+      end
+
+      if char == "\\"
+        escape_next = true
+        next
+      end
+
+      if char == '"' && !escape_next
+        in_string = !in_string
+        next
+      end
+
+      next if in_string
+
+      if char == "{"
+        brace_count += 1
+      elsif char == "}"
+        brace_count -= 1
+        if brace_count == 0
+          return text[start_idx..i]
+        end
+      end
+    end
+
+    # If we didn't find a matching closing brace, return nil
+    nil
   end
 
   def fallback_analysis

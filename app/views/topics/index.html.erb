@@ -11,7 +11,8 @@
         <li class="entry-list__item">
           <%= link_to topic.name, journal_entries_path(topic_id: topic.id), class: "badge" %>
           <span class="muted">
-            · <%= topic.journal_entries.count %> entr<%= topic.journal_entries.count == 1 ? "y" : "ies" %>
+            <% count = topic.respond_to?(:journal_entries_count) ? topic.journal_entries_count.to_i : topic.journal_entries.count %>
+            · <%= count %> entr<%= count == 1 ? "y" : "ies" %>
           </span>
         </li>
       <% end %>
