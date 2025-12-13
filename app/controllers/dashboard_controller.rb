@@ -4,6 +4,13 @@ class DashboardController < ApplicationController
     @recent_entries = current_user.journal_entries.includes(:prompt).order(received_at: :desc, created_at: :desc).limit(10)
   end
 
+  def send_next_prompt
+    authenticate_user!
+    PromptSender.new(current_user).send_prompt!
+    redirect_to dashboard_path, notice: "Sent you an email with your prompts."
+  end
+
+
   def send_prompt
     unless current_user.onboarding_complete?
       redirect_to settings_path, alert: "Please complete your settings first."

@@ -59,7 +59,8 @@ class JournalReplyMailbox < ApplicationMailbox
   def verify_token(token)
     verifier = Rails.application.message_verifier(:journal_reply)
     verifier.verify(token)
-  rescue ActiveSupport::MessageVerifier::InvalidSignature
-    nil
-  end
+  rescue
+    ActiveSupport::MessageVerifier::InvalidSignature
+  [nil, nil]
+end
 end

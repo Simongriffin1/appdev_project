@@ -25,6 +25,12 @@ Rails.application.routes.draw do
 
   # Journal entries
   resources :journal_entries, only: [:index, :show, :new, :create]
+  
+  mount ActionMailbox::Engine => "/rails/conductor/action_mailbox" if Rails.env.development?
+
+  post "/send_next_prompt" => "dashboard#send_next_prompt"
+
+
 
   # Topics
   resources :topics, only: [:index, :show]
