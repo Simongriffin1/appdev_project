@@ -1,20 +1,19 @@
 require "json"
 
 class EntryAnalysisGenerator
+  MIN_TAGS = 3
+  MAX_TAGS = 6
+
   def initialize(journal_entry)
     @entry = journal_entry
   end
 
   def generate!
-    # Skip if analysis already exists (or update it - for now we'll skip)
+    # Skip if analysis already exists
     return @entry.entry_analysis if @entry.entry_analysis.present?
 
     # Generate analysis using OpenAI if available, otherwise use fallback
-    analysis_data = if ENV["OPENAI_API_KEY"].present?
-                      generate_with_openai
-                    else
-                      fallback_analysis
-                    end
+    analysis_data = generate_analysis
 
     # Create EntryAnalysis
     analysis = EntryAnalysis.create!(
@@ -22,11 +21,12 @@ class EntryAnalysisGenerator
       summary: analysis_data[:summary],
       sentiment: analysis_data[:sentiment],
       emotion: analysis_data[:emotion],
-      keywords: analysis_data[:topics].join(", ")
+      tags: analysis_data[:tags], # JSON array
+      key_themes: analysis_data[:key_themes] # JSON array
     )
 
     # Create or find topics and link them
-    analysis_data[:topics].each do |topic_name|
+    analysis_data[:tags].each do |topic_name|
       next if topic_name.blank?
 
       normalized_name = topic_name.strip.downcase
@@ -44,106 +44,165 @@ class EntryAnalysisGenerator
 
   private
 
-  def generate_with_openai
-    require "openai"
+  def generate_analysis
+    entry_body = @entry.cleaned_body.presence || @entry.body.to_s
+    
+    # Check cache first
+    cache_key = "entry_analysis:#{@entry.id}:#{Digest::MD5.hexdigest(entry_body)}"
+    cached_result = Rails.cache.read(cache_key)
+    if cached_result
+      Rails.logger.info "Using cached analysis for entry #{@entry.id}"
+      return cached_result
+    end
 
-    client = OpenAI::Client.new(access_token: ENV["OPENAI_API_KEY"])
+    # Try OpenAI if available
+    if ENV["OPENAI_API_KEY"].present?
+      begin
+        # Strip PII from entry body before sending to OpenAI
+        sanitized_body = PIIStripper.strip(entry_body)
 
-    prompt = <<~PROMPT
-      Here is a journaling entry:
+        client = OpenAIClient.new
+        result = client.json_completion(
+          system_prompt: build_system_prompt,
+          user_prompt: build_user_prompt(sanitized_body),
+          model: "gpt-4o-mini",
+          temperature: 0.3,
+          max_tokens: 400
+        )
 
-      #{@entry.body}
+        # Validate and format response
+        tags = Array(result["tags"] || result["topics"] || []).first(MAX_TAGS)
+        tags = ensure_min_tags(tags, sanitized_body) if tags.length < MIN_TAGS
 
-      Please analyze this entry and return JSON with the following keys:
-      - summary: A 1-3 sentence summary of the entry
-      - sentiment: One of "positive", "neutral", or "negative"
-      - emotion: One main emotion word (e.g., "joy", "anxiety", "frustration", "pride", "sadness", "anger", "calm", "excitement")
-      - topics: An array of 1-3 short topic labels (single words or short phrases)
+        analysis_data = {
+          summary: result["summary"]&.strip || fallback_analysis[:summary],
+          sentiment: validate_sentiment(result["sentiment"]) || "neutral",
+          emotion: result["emotion"]&.strip || "neutral",
+          tags: tags,
+          key_themes: tags.first(3) # Use first 3 tags as key themes
+        }
 
-      Return ONLY valid JSON, no other text.
-    PROMPT
+        # Validate summary length (2-3 sentences)
+        analysis_data[:summary] = ensure_summary_length(analysis_data[:summary])
 
-    response = client.chat(
-      parameters: {
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are a helpful assistant that analyzes journal entries. Always return valid JSON." },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.3,
-        max_tokens: 300,
-        response_format: { type: "json_object" }
-      }
-    )
-
-    json_text = response.dig("choices", 0, "message", "content")&.strip
-    return fallback_analysis if json_text.blank?
-
-    # Try to extract JSON from the response (in case there's extra text)
-    # Use a balanced brace matcher to handle nested structures (arrays, objects)
-    json_text = extract_json_object(json_text)
-    return fallback_analysis if json_text.blank?
-
-    parsed = JSON.parse(json_text)
-
-    {
-      summary: parsed["summary"] || fallback_analysis[:summary],
-      sentiment: parsed["sentiment"] || "neutral",
-      emotion: parsed["emotion"] || "neutral",
-      topics: Array(parsed["topics"] || [])
-    }
-  rescue StandardError => e
-    Rails.logger.error "OpenAI API error: #{e.message}"
-    fallback_analysis
-  end
-
-  def extract_json_object(text)
-    # Find the first opening brace
-    start_idx = text.index("{")
-    return nil unless start_idx
-
-    # Count braces to find the matching closing brace
-    brace_count = 0
-    in_string = false
-    escape_next = false
-
-    (start_idx...text.length).each do |i|
-      char = text[i]
-
-      if escape_next
-        escape_next = false
-        next
-      end
-
-      if char == "\\"
-        escape_next = true
-        next
-      end
-
-      if char == '"' && !escape_next
-        in_string = !in_string
-        next
-      end
-
-      next if in_string
-
-      if char == "{"
-        brace_count += 1
-      elsif char == "}"
-        brace_count -= 1
-        if brace_count == 0
-          return text[start_idx..i]
-        end
+        # Cache successful result
+        Rails.cache.write(cache_key, analysis_data, expires_in: 24.hours)
+        return analysis_data
+      rescue OpenAIClient::Error => e
+        # Log error but don't crash - use fallback
+        Rails.logger.error "OpenAI error in EntryAnalysisGenerator: #{e.class} - #{e.message}"
+        Rails.logger.error e.backtrace.join("\n") if Rails.env.development?
+      rescue StandardError => e
+        # Catch any other errors
+        Rails.logger.error "Unexpected error in EntryAnalysisGenerator: #{e.class} - #{e.message}"
+        Rails.logger.error e.backtrace.join("\n") if Rails.env.development?
       end
     end
 
-    # If we didn't find a matching closing brace, return nil
-    nil
+    # Fallback to non-AI analysis
+    fallback_analysis
+  end
+
+  def build_system_prompt
+    <<~SYS
+      You are a helpful assistant that analyzes journal entries.
+      Your analysis helps users understand patterns in their reflections.
+
+      Return JSON with these keys:
+      - summary: A 2-3 sentence summary of the entry (no personal identifiers)
+      - sentiment: One of "positive", "neutral", or "negative"
+      - emotion: One main emotion word (e.g., "joy", "anxiety", "frustration", "pride", "sadness", "anger", "calm", "excitement")
+      - tags: An array of 3-6 short topic labels (single words or short phrases, no personal info)
+
+      Important:
+      - NEVER include email addresses, names, or other personal identifiers in your response
+      - Summary should be 2-3 sentences, not more
+      - Tags should be 3-6 items, descriptive but general
+      - Return ONLY valid JSON, no other text
+    SYS
+  end
+
+  def build_user_prompt(sanitized_body)
+    <<~USER
+      Here is a journaling entry (PII has been removed):
+
+      #{sanitized_body}
+
+      Please analyze this entry and return the JSON as specified.
+    USER
+  end
+
+  def validate_sentiment(sentiment)
+    valid_sentiments = %w[positive neutral negative]
+    valid_sentiments.include?(sentiment&.downcase) ? sentiment.downcase : nil
+  end
+
+  def ensure_min_tags(tags, body)
+    # If we have fewer than MIN_TAGS, try to extract more from the body
+    common_topics = {
+      "work" => %w[work job office meeting project deadline career],
+      "relationships" => %w[friend family partner relationship love social],
+      "health" => %w[health exercise workout gym sick wellness],
+      "travel" => %w[travel trip vacation journey adventure],
+      "learning" => %w[learn study read book class education],
+      "creativity" => %w[creative art write draw music expression],
+      "reflection" => %w[think reflect consider ponder contemplate],
+      "emotions" => %w[feel feeling emotion mood],
+      "goals" => %w[goal plan achieve accomplish target]
+    }
+
+    body_lower = body.downcase
+    common_topics.each do |topic, keywords|
+      if keywords.any? { |word| body_lower.include?(word) } && !tags.include?(topic)
+        tags << topic
+        break if tags.length >= MIN_TAGS
+      end
+    end
+
+    # Fill remaining slots with generic tags if needed
+    while tags.length < MIN_TAGS
+      generic_tags = ["reflection", "thoughts", "experience", "insight"]
+      tag = generic_tags.find { |t| !tags.include?(t) }
+      tags << tag if tag
+      break if tags.length >= MIN_TAGS || !tag
+    end
+
+    tags.first(MAX_TAGS)
+  end
+
+  def ensure_summary_length(summary)
+    sentences = summary.split(/[.!?]+/).reject(&:blank?)
+    
+    if sentences.length > 3
+      # Take first 3 sentences
+      sentences.first(3).join(". ") + "."
+    elsif sentences.length < 2
+      # Ensure at least 2 sentences
+      if sentences.any?
+        first_sentence = sentences.first
+        # Split long sentence or add a generic second sentence
+        if first_sentence.length > 100
+          parts = first_sentence.split(/[,;]/)
+          if parts.length >= 2
+            "#{parts.first.strip}.#{parts[1..-1].join(', ')}."
+          else
+            "#{first_sentence.strip}. This entry reflects on personal experiences."
+          end
+        else
+          "#{first_sentence.strip}. This entry reflects on personal experiences."
+        end
+      else
+        "This entry contains personal reflections. The user is processing their thoughts and experiences."
+      end
+    else
+      summary
+    end
   end
 
   def fallback_analysis
     # Deterministic analysis based on keywords and patterns
-    body_lower = @entry.body.downcase
+    entry_body = @entry.cleaned_body.presence || @entry.body.to_s
+    body_lower = entry_body.downcase
 
     # Detect sentiment from keywords
     positive_words = %w[happy joy excited grateful thankful proud love amazing wonderful great good]
@@ -180,7 +239,7 @@ class EntryAnalysisGenerator
       end
     end
 
-    # Extract simple topics from common words
+    # Extract topics from common words
     common_topics = {
       "work" => %w[work job office meeting project deadline],
       "relationships" => %w[friend family partner relationship love],
@@ -198,19 +257,24 @@ class EntryAnalysisGenerator
       end
     end
 
-    # Generate a simple summary
-    first_sentence = @entry.body.split(/[.!?]/).first&.strip
-    summary = if first_sentence && first_sentence.length > 20
-                "#{first_sentence.truncate(150)}."
+    # Ensure we have 3-6 tags
+    detected_topics = ensure_min_tags(detected_topics, entry_body)
+
+    # Generate a simple summary (2-3 sentences)
+    sentences = entry_body.split(/[.!?]/).reject(&:blank?).first(3)
+    summary = if sentences.length >= 2
+                sentences.first(3).join(". ") + "."
               else
-                @entry.body.truncate(200)
+                first_sentence = sentences.first || entry_body.truncate(100)
+                "#{first_sentence.strip}. This entry reflects on personal experiences."
               end
 
     {
       summary: summary,
       sentiment: sentiment,
       emotion: detected_emotion,
-      topics: detected_topics.first(3) # Limit to 3 topics
+      tags: detected_topics.first(MAX_TAGS),
+      key_themes: detected_topics.first(3)
     }
   end
 end

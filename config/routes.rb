@@ -18,13 +18,12 @@ Rails.application.routes.draw do
   patch "/settings" => "settings#update"
 
   # Dashboard (root)
-  get  "/dashboard" => "dashboard#show", as: :dashboard
+  get "/dashboard" => "dashboard#show", as: :dashboard
+  post "/send_prompt" => "dashboard#send_prompt", as: :send_prompt
+  post "/dashboard/toggle_schedule" => "dashboard#toggle_schedule", as: :toggle_schedule
   root "dashboard#show"
 
-  # Manual prompt sending (your dashboard button uses send_prompt_path)
-  post "/send_prompt" => "dashboard#send_prompt", as: :send_prompt
-
-  # Optional: if you're using this route, keep it; otherwise delete it
+  # Backwards-compatible route
   post "/send_next_prompt" => "dashboard#send_next_prompt"
 
   # Prompts
@@ -44,6 +43,12 @@ Rails.application.routes.draw do
   # Email messages (read-only)
   resources :email_messages, only: [:index, :show]
 
-  # Action Mailbox (development only)
-  mount ActionMailbox::Engine => "/rails/action_mailbox" if Rails.env.development?
+  # Action Mailbox ingress (production) and conductor (development)
+  mount ActionMailbox::Engine => "/rails/action_mailbox"
+  
+  # Development-only tools
+  if Rails.env.development?
+    # Letter Opener Web for email preview
+    mount LetterOpenerWeb::Engine, at: "/letter_opener" if defined?(LetterOpenerWeb)
+  end
 end

@@ -29,4 +29,14 @@ class EmailMessage < ApplicationRecord
   belongs_to :user
   belongs_to :prompt, optional: true
   belongs_to :journal_entry, optional: true
+
+  # Enums
+  enum direction: {
+    inbound: "inbound",
+    outbound: "outbound"
+  }
+
+  # Validations
+  validates :direction, presence: true
+  validates :subject, presence: true
 end

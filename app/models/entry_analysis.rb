@@ -24,5 +24,33 @@ class EntryAnalysis < ApplicationRecord
 
   # If you want an easy shortcut to user:
   has_one :user, through: :journal_entry
-end
 
+  # Validations
+  validates :sentiment, inclusion: { in: %w[positive neutral negative] }, allow_nil: true
+
+  # Serialize JSON fields (Rails 8 handles jsonb automatically, but we can add helpers)
+  def tags
+    super || []
+  end
+
+  def tags=(value)
+    super(Array(value))
+  end
+
+  def key_themes
+    super || []
+  end
+
+  def key_themes=(value)
+    super(Array(value))
+  end
+
+  # Helper methods for backward compatibility with keywords
+  def keywords
+    tags.join(", ")
+  end
+
+  def keywords=(value)
+    self.tags = value.to_s.split(",").map(&:strip).reject(&:blank?)
+  end
+end

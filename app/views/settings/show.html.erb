@@ -18,27 +18,38 @@
     </div>
 
     <div class="form-field">
-      <%= f.label :prompt_frequency, "Email Frequency" %>
-      <%= f.select :prompt_frequency, 
+      <%= f.label :schedule_frequency, "Email Frequency" %>
+      <% current_frequency = @user.schedule_frequency || @user.prompt_frequency %>
+      <%= f.select :schedule_frequency, 
           options_for_select([
             ["Daily", "daily"],
             ["Weekdays only", "weekdays"],
             ["Weekly", "weekly"]
-          ], @user.prompt_frequency),
-          { prompt: "Select frequency" },
+          ], current_frequency),
+          { prompt: "Select frequency", include_blank: false },
           { required: true } %>
+      <small class="muted">How often you want to receive journaling prompts.</small>
     </div>
 
     <div class="form-field">
-      <%= f.label :send_times, "Send Times (local time)" %>
-      <%= f.text_field :send_times, 
-          value: @user.send_times || "09:00,21:00",
-          placeholder: "09:00,21:00",
+      <%= f.label :schedule_time, "Send Time (local time)" %>
+      <% 
+        # Support both schedule_time (Time) and send_times (string)
+        time_value = if @user.schedule_time.present?
+                      @user.schedule_time.strftime("%H:%M")
+                    elsif @user.send_times.present?
+                      @user.send_times.split(",").first&.strip
+                    else
+                      "09:00"
+                    end
+      %>
+      <%= f.time_field :schedule_time, 
+          value: time_value,
           required: true %>
-      <small class="muted">Comma-separated times in 24-hour format (e.g., "09:00,21:00" for 9am and 9pm).</small>
+      <small class="muted">Time in 24-hour format (e.g., 09:00 for 9am). You can set multiple times by editing send_times directly if needed.</small>
     </div>
 
-    <div class="btn-row">
+    <div class="btn-row" style="margin-top: 1.5rem;">
       <%= f.submit "Save Settings", class: "btn btn-primary" %>
       <% if current_user.onboarding_complete? %>
         <%= link_to "Cancel", dashboard_path, class: "btn btn-ghost" %>

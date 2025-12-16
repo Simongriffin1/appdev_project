@@ -1,3 +1,19 @@
+# Recurring jobs for scheduled prompt sending
+# Runs every 10 minutes to check for users who need prompts
+production:
+  send_scheduled_prompts:
+    class: SendScheduledPromptsJob
+    queue: default
+    schedule: every 10 minutes
+    description: "Send scheduled journal prompts to users"
+
+development:
+  send_scheduled_prompts:
+    class: SendScheduledPromptsJob
+    queue: default
+    schedule: every 10 minutes
+    description: "Send scheduled journal prompts to users (development)"
+
 # production:
 #   periodic_cleanup:
 #     class: CleanSoftDeletedRecordsJob

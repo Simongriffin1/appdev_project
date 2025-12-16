@@ -1,12 +1,21 @@
 Hello!
 
+<% if @prompt.body.present? %>
+<%= @prompt.body %>
+
+<% else %>
 Here are your journaling questions for today:
 
+<% if @prompt.question_1.present? %>
 Question 1
 <%= @prompt.question_1 %>
+<% end %>
 
+<% if @prompt.question_2.present? %>
 Question 2
 <%= @prompt.question_2 %>
+<% end %>
+<% end %>
 
 ---
 

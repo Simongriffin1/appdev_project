@@ -54,6 +54,10 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  # Preview emails in browser instead of sending them (web interface)
+  gem "letter_opener_web"
+  # Fallback: opens emails in default browser
+  gem "letter_opener"
 end
 
 # Additional gems for AppDev
@@ -77,6 +81,8 @@ gem "simple_form"
 gem "strip_attributes"
 gem "validate_url"
 gem "ruby-openai"
+# Postmark for production email delivery
+gem "postmark"
 
 group :development do
   gem "annotaterb"
